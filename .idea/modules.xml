@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/config/config.iml" filepath="$PROJECT_DIR$/config/config.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gateway/gateway.iml" filepath="$PROJECT_DIR$/gateway/gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/node/node.iml" filepath="$PROJECT_DIR$/node/node.iml" />
+      <module fileurl="file://$PROJECT_DIR$/proxy/proxy.iml" filepath="$PROJECT_DIR$/proxy/proxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/turbine/turbine.iml" filepath="$PROJECT_DIR$/turbine/turbine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vbc-eureka-spring-cloud.iml" filepath="$PROJECT_DIR$/vbc-eureka-spring-cloud.iml" />
+    </modules>
+  </component>
+</project>

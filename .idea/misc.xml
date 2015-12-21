@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/proxy/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>AOP</id>
+          </State>
+          <State>
+            <id>Android Lint</id>
+          </State>
+          <State>
+            <id>Class structureJava</id>
+          </State>
+          <State>
+            <id>Code StyleScala</id>
+          </State>
+          <State>
+            <id>Code quality toolsJavaScript</id>
+          </State>
+          <State>
+            <id>Code style issuesJava</id>
+          </State>
+          <State>
+            <id>Code style issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Control flow issuesJava</id>
+          </State>
+          <State>
+            <id>Data flow issuesJava</id>
+          </State>
+          <State>
+            <id>Data flow issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Encapsulation issuesJava</id>
+          </State>
+          <State>
+            <id>General</id>
+          </State>
+          <State>
+            <id>GeneralScala</id>
+          </State>
+          <State>
+            <id>Java</id>
+          </State>
+          <State>
+            <id>JavaScript</id>
+          </State>
+          <State>
+            <id>Naming conventionsJava</id>
+          </State>
+          <State>
+            <id>Properties Files</id>
+          </State>
+          <State>
+            <id>Python</id>
+          </State>
+          <State>
+            <id>Ruby</id>
+          </State>
+          <State>
+            <id>Scala</id>
+          </State>
+          <State>
+            <id>Security issuesJava</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Android</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
+</project>
