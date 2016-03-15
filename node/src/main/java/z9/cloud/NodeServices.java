@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import z9.cloud.z9.cloud.model.Input;
+import z9.cloud.z9.cloud.model.Output;
 
 import java.io.*;
 
@@ -37,6 +39,16 @@ public class NodeServices {
 	@RequestMapping(value = "/v1/http", method=RequestMethod.POST)
 	public Object httpV1(@RequestBody HttpInput input) {
 		return executeHttp(input);
+	}
+
+	@RequestMapping(value= "v1/test", method=RequestMethod.POST)
+	public Output testV1(@RequestBody Input input) {
+		System.out.println("input: " + input);
+		Output output = new Output();
+		output.setOutput("Test");
+		output.setCode(200);
+
+		return output;
 	}
 
 
