@@ -1,23 +1,24 @@
 package z9.cloud.z9.cloud.http;
 
-import com.zeronines.service.HttpInput;
-import com.zeronines.service.HttpOutput;
-import com.zeronines.service.HttpService;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import z9.cloud.RequestHandler;
+import z9.cloud.core.HttpInput;
+import z9.cloud.core.HttpOutput;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
+
 public class HttpProxyRequestHandler implements RequestHandler {
 	private static Log logger = LogFactory.getLog(HttpProxyRequestHandler.class);
 	
-	private HttpService httpService;
+	private HttpDelegate httpDelegate;
 
-	public HttpProxyRequestHandler(HttpService httpService) {
-		this.httpService = httpService;
+	public HttpProxyRequestHandler(HttpDelegate httpDelegate) {
+		this.httpDelegate = httpDelegate;
 	}
 
 	public void handleRequest(Socket socket) {
@@ -28,7 +29,7 @@ public class HttpProxyRequestHandler implements RequestHandler {
 				if (clientInput == null) {
 					break;
 				}
-				HttpOutput output = httpService.doGet(clientInput);
+				HttpOutput output = httpDelegate.handle(clientInput);
 				if (output == null || output.getPayload() == null) {
 				    return;
 				}

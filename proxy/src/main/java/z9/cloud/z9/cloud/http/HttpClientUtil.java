@@ -1,10 +1,15 @@
 package z9.cloud.z9.cloud.http;
 
-import com.zeronines.enums.HttpMethod;
-import com.zeronines.service.HttpInput;
-import org.apache.commons.httpclient.*;
+
+import org.apache.commons.httpclient.ChunkedInputStream;
+import org.apache.commons.httpclient.ContentLengthInputStream;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HeaderGroup;
+import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import z9.cloud.core.HttpInput;
+import z9.cloud.core.HttpMethod;
 
 import java.io.IOException;
 import java.io.InputStream;

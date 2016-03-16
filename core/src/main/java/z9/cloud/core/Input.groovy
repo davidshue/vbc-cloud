@@ -1,4 +1,4 @@
-package z9.cloud.z9.cloud.model
+package z9.cloud.core
 
 import groovy.transform.ToString
 

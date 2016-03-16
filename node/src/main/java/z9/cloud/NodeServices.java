@@ -1,19 +1,30 @@
 package z9.cloud;
 
-import com.zeronines.enums.HttpMethod;
-import com.zeronines.service.HttpInput;
-import com.zeronines.service.HttpOutput;
-import org.apache.commons.httpclient.*;
+
+import org.apache.commons.httpclient.ContentLengthInputStream;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HeaderGroup;
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpConnection;
+import org.apache.commons.httpclient.HttpParser;
+import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import z9.cloud.z9.cloud.model.Input;
-import z9.cloud.z9.cloud.model.Output;
+import z9.cloud.core.HttpInput;
+import z9.cloud.core.HttpMethod;
+import z9.cloud.core.HttpOutput;
+import z9.cloud.core.Input;
+import z9.cloud.core.Output;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by dshue1 on 3/13/16.
