@@ -37,7 +37,7 @@ public class NodeServices {
 
 	private long waitTime = 200;
 	private int serverPort = 80;
-	private String serverAddress = "www.yahoo.com";
+	private String serverAddress = "www.zenvault.com";
 	private String protocol = "http";
 	private String nodeId = "node1";
 
