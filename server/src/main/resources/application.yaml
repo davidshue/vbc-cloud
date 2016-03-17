@@ -1,3 +1,6 @@
+spring:
+  application:
+    name: server
 server:
   port: 8761
 
