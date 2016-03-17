@@ -1,3 +1,8 @@
 spring:
   application:
     name: node
+http:
+  waittime: 200
+  server: www.zenvault.com
+  port: 80
+  protocol: http

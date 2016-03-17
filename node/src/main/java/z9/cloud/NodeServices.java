@@ -10,6 +10,7 @@ import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +21,7 @@ import z9.cloud.core.HttpOutput;
 import z9.cloud.core.Input;
 import z9.cloud.core.Output;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,11 +37,27 @@ public class NodeServices {
 	private static final String LINE_RETURN = "\r\n";
 	private static final String HTTP_ELEMENT_CHARSET = "US-ASCII";
 
-	private long waitTime = 200;
-	private int serverPort = 80;
-	private String serverAddress = "www.zenvault.com";
-	private String protocol = "http";
+	@Value("${http.waittime}")
+	private long waitTime;
+
+	@Value("${http.port}")
+	private int serverPort;
+
+	@Value("${http.server}")
+	private String serverAddress;
+
+	@Value("${http.protocol}")
+	private String protocol;
+
 	private String nodeId = "node1";
+
+	private HostConfiguration config;
+
+	@PostConstruct
+	public void afterInit() {
+		config = new HostConfiguration();
+		config.setHost(serverAddress, serverPort, protocol);
+	}
 
 	@RequestMapping(value = "/v1", method=RequestMethod.POST)
 	public String v1() {
@@ -54,9 +72,8 @@ public class NodeServices {
 
 	@RequestMapping(value= "v1/test", method=RequestMethod.POST)
 	public Output testV1(@RequestBody Input input) {
-		System.out.println("input: " + input);
 		Output output = new Output();
-		output.setOutput("Test");
+		output.setOutput(input.getName());
 		output.setCode(200);
 
 		return output;
@@ -68,9 +85,7 @@ public class NodeServices {
 		HttpConnection httpConnection = null;
 		try {
 			SimpleHttpConnectionManager connectionManager = new SimpleHttpConnectionManager();
-			HostConfiguration config = new HostConfiguration();
-			config.setHost(serverAddress, serverPort, protocol);
-			httpConnection = connectionManager.getConnection(config);
+			httpConnection = connectionManager.getConnectionWithTimeout(config, 200);
 			if (!httpConnection.isOpen()) {
 				httpConnection.open();
 			}
@@ -80,6 +95,7 @@ public class NodeServices {
 			output.setMethod(content.getMethod());
 			output.setSessionId(content.getSessionId());
 			output.setNodeId(nodeId);
+
 			return output;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
