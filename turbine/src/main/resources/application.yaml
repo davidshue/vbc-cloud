@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: turbine
+server:
+  port: 8060
+
+info:
+  component: Turbine
+
+turbine:
+  aggregator:
+    clusterConfig: GATEWAY
+  appConfig: gateway
