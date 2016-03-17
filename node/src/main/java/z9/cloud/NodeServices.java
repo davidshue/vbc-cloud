@@ -10,7 +10,9 @@ import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,6 +38,9 @@ public class NodeServices {
 	private static Log logger = LogFactory.getLog(NodeServices.class);
 	private static final String LINE_RETURN = "\r\n";
 	private static final String HTTP_ELEMENT_CHARSET = "US-ASCII";
+
+	@Autowired
+	private Environment environment;
 
 	@Value("${http.waittime}")
 	private long waitTime;
@@ -73,7 +78,7 @@ public class NodeServices {
 	@RequestMapping(value= "v1/test", method=RequestMethod.POST)
 	public Output testV1(@RequestBody Input input) {
 		Output output = new Output();
-		output.setOutput(input.getName());
+		output.setOutput(input.getName() + " on " + environment.getActiveProfiles()[0]);
 		output.setCode(200);
 
 		return output;
