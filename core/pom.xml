@@ -6,7 +6,7 @@
 
 	<groupId>z9.cloud</groupId>
 	<artifactId>core</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 
 	<properties>
 		<maven.test.skip>true</maven.test.skip>
