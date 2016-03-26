@@ -66,7 +66,7 @@ public class NodeServices {
 
 	@RequestMapping(value = "/v1", method=RequestMethod.POST)
 	public String v1() {
-		return "hi there!";
+		return "hi there again!";
 	}
 
 
@@ -75,10 +75,15 @@ public class NodeServices {
 		return executeHttp(input);
 	}
 
-	@RequestMapping(value= "v1/test", method=RequestMethod.POST)
+	@RequestMapping(value= "/v1/test", method=RequestMethod.POST)
 	public Output testV1(@RequestBody Input input) {
 		Output output = new Output();
-		output.setOutput(input.getName() + " on " + environment.getActiveProfiles()[0]);
+		if (environment.getActiveProfiles().length == 0) {
+			output.setOutput(input.getName() + " on default");
+		}
+		else {
+			output.setOutput(input.getName() + " on " + environment.getActiveProfiles()[0]);
+		}
 		output.setCode(200);
 
 		return output;

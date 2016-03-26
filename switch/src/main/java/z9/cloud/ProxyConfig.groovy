@@ -12,9 +12,9 @@ import z9.cloud.z9.cloud.http.HttpProxyRequestHandler
 
 @Configuration
 class ProxyConfig {
-	@Value('${proxy.queue.size.core}') private int coreSize
-	@Value('${proxy.queue.size.max}') private int maxSize
-	@Value('${proxy.queue.size.capacity}') private int capacity
+	@Value('${threadpool.queue.size.core}') private int coreSize
+	@Value('${threadpool.queue.size.max}') private int maxSize
+	@Value('${threadpool.queue.size.capacity}') private int capacity
 
 	@Bean
 	taskExecutor() {

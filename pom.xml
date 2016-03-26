@@ -16,7 +16,7 @@
 		<module>config</module>
 		<module>turbine</module>
 		<module>node</module>
-		<module>proxy</module>
+		<module>switch</module>
 	</modules>	
 
 </project>

@@ -41,6 +41,7 @@ public class HttpProxyRequestHandler implements RequestHandler {
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		} catch (Exception e) {
+			e.printStackTrace();
 		    logger.error(e.getMessage());
 		}
 		finally {
