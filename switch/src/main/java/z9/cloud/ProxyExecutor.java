@@ -103,7 +103,7 @@ public class ProxyExecutor extends Thread implements Proxy {
                 logger.debug("waiting...");
                 Socket s = serverSocket.accept();
                 s.setTcpNoDelay(true);
-                s.setSoTimeout( 20 * 1000 );
+                s.setSoTimeout( 200 * 1000 );
 
                 // Log some debugging information
                 InetAddress addr = s.getInetAddress();
