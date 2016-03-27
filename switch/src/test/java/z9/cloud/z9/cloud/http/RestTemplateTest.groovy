@@ -1,6 +1,7 @@
 package z9.cloud.z9.cloud.http
 
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -28,6 +29,7 @@ class RestTemplateTest {
 	}
 
 	@Test
+	@Ignore
 	void testHttp() {
 		Input input = new  Input(name: 'david shue', age: 22)
 
