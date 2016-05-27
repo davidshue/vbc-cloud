@@ -14,9 +14,11 @@
 		<module>server</module>
 		<module>gateway</module>
 		<module>config</module>
+		<module>core</module>
 		<module>turbine</module>
 		<module>node</module>
 		<module>switch</module>
+		<module>security</module>
 	</modules>	
 
 </project>
