@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>gateway</name>
-	<description>VBC Eureka Zuul Service Gateway</description>
+	<description>VBC Eureka Zuul Service Gateway(might not be needed)</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

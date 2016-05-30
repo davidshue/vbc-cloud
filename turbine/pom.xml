@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>turbine</name>
-	<description>Demo project for Spring Boot</description>
+	<description>VBC Cloud turbine</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

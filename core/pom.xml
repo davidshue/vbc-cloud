@@ -8,6 +8,9 @@
 	<artifactId>core</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 
+	<name>core</name>
+	<description>core library for vbc cloud</description>
+
 	<properties>
 		<maven.test.skip>true</maven.test.skip>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

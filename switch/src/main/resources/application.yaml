@@ -1,6 +1,10 @@
 spring:
   application:
     name: switch
+  rabbitmq:
+    addresses: localhost
+    username: guest
+    password: guest
 hystrix:
   command:
     default:
