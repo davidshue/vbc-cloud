@@ -1,6 +1,18 @@
 package z9.cloud;
 
 
+import z9.cloud.core.HttpInput;
+import z9.cloud.core.HttpMethod;
+import z9.cloud.core.HttpOutput;
+import z9.cloud.core.Input;
+import z9.cloud.core.Output;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import javax.annotation.PostConstruct;
 import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HeaderGroup;
@@ -10,25 +22,15 @@ import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import z9.cloud.core.HttpInput;
-import z9.cloud.core.HttpMethod;
-import z9.cloud.core.HttpOutput;
-import z9.cloud.core.Input;
-import z9.cloud.core.Output;
-
-import javax.annotation.PostConstruct;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * Created by dshue1 on 3/13/16.
@@ -54,9 +56,14 @@ public class NodeServices {
 	@Value("${http.protocol}")
 	private String protocol;
 
+	@Autowired
+	@Qualifier("env")
 	private String nodeId = "node1";
 
 	private HostConfiguration config;
+
+	@Autowired
+	private AmqpTemplate template;
 
 	@PostConstruct
 	public void afterInit() {
@@ -66,7 +73,7 @@ public class NodeServices {
 
 	@RequestMapping(value = "/v1", method=RequestMethod.POST)
 	public String v1() {
-		return "hi there again!";
+		return "hi there again! from " + nodeId;
 	}
 
 
@@ -78,12 +85,7 @@ public class NodeServices {
 	@RequestMapping(value= "/v1/test", method=RequestMethod.POST)
 	public Output testV1(@RequestBody Input input) {
 		Output output = new Output();
-		if (environment.getActiveProfiles().length == 0) {
-			output.setOutput(input.getName() + " on default");
-		}
-		else {
-			output.setOutput(input.getName() + " on " + environment.getActiveProfiles()[0]);
-		}
+		output.setOutput(input.getName() + " on " + nodeId);
 		output.setCode(200);
 
 		return output;
