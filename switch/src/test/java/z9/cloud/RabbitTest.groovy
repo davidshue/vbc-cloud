@@ -1,7 +1,11 @@
 package z9.cloud
 
+import z9.cloud.core.HttpInput
+import z9.cloud.core.HttpMethod
+
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.amqp.core.AmqpTemplate
@@ -28,7 +32,9 @@ class RabbitTest {
 		def json = gson.toJson(payload)
 		println json
 
-		template.convertAndSend("http_exchange", 'broadcast', json)
+		HttpInput input = new HttpInput(origin: 'this', method: HttpMethod.GET)
+
+		template.convertAndSend("http_exchange", 'broadcast', input)
 
 		long time1 = System.currentTimeMillis()
 		println 'took ' + (time1-time0) + ' msecs'

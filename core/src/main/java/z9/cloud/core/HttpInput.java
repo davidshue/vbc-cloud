@@ -1,12 +1,11 @@
 package z9.cloud.core;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
 
 
 public class HttpInput implements Serializable {
@@ -17,17 +16,26 @@ public class HttpInput implements Serializable {
 	private String uri;
 	private String httpversion;
 	private CookieSet cookieSet = new CookieSet();
-	private String sessionId = null;	
+	private String sessionId = null;
 	private String nodeId = null;
+	private String origin = null;
 	
 	private byte[] payload = null;
 	
-	public void setPayload(byte[] payload) {
-	    this.payload = payload;
+	public String getOrigin() {
+		return origin;
 	}
-	
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
 	public byte[] getPayload() {
 		return payload;
+	}
+
+	public void setPayload(byte[] payload) {
+		this.payload = payload;
 	}
 
 	public String getTitle() {
@@ -67,7 +75,7 @@ public class HttpInput implements Serializable {
 	}
 	
 	public void setCookieSet(CookieSet cookieSet) {
-	    this.cookieSet = cookieSet;
+		this.cookieSet = cookieSet;
 	}
 
 	public void addCookie(Cookie cookie) {
@@ -83,47 +91,47 @@ public class HttpInput implements Serializable {
 	}
 	
 	public void setSessionId(String sessionId) {
-	    this.sessionId = sessionId;
+		this.sessionId = sessionId;
 	}
 
-    public void write(OutputStream out) throws IOException {
-        PrintWriter writer = new PrintWriter(out, true);
-        writer.println(title + "\r");
-        if (!cookieSet.getCookies().isEmpty()) {
-            writer.println("Cookie: " + cookieSet.toString() + "\r");
-        }
-        out.write(payload);
-        writer.println("\r");
-    }
+	public void write(OutputStream out) throws IOException {
+		PrintWriter writer = new PrintWriter(out, true);
+		writer.println(title + "\r");
+		if (!cookieSet.getCookies().isEmpty()) {
+			writer.println("Cookie: " + cookieSet.toString() + "\r");
+		}
+		out.write(payload);
+		writer.println("\r");
+	}
 
-    /**
-     * @return the nodeId
-     */
-    public String getNodeId() {
-        return nodeId;
-    }
+	/**
+	 * @return the nodeId
+	 */
+	public String getNodeId() {
+		return nodeId;
+	}
 
-    /**
-     * @param nodeId the nodeId to set
-     */
-    public void setNodeId(String nodeId) {
-        this.nodeId = nodeId;
-    }
-    
-    public void resolveCookie(String cookieLine) {
-    	CookieSet cookieSet = new CookieSet(cookieLine);
+	/**
+	 * @param nodeId the nodeId to set
+	 */
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
 
-    	String sessionId = cookieSet.getValue("zsessionid");
-    	if (StringUtils.isNotBlank(sessionId)) {
-    		setSessionId(sessionId);
-    		cookieSet.removeCookie("zsessionid");
-    	}
-    	String nodeId = cookieSet.getValue("znodeid");
-    	if (StringUtils.isNotBlank(nodeId)) {
-    		setNodeId(nodeId);
-    		cookieSet.removeCookie("znodeid");
-    	}
-    	this.cookieSet = cookieSet;
-    }
+	public void resolveCookie(String cookieLine) {
+		CookieSet cookieSet = new CookieSet(cookieLine);
+
+		String sessionId = cookieSet.getValue("zsessionid");
+		if (StringUtils.isNotBlank(sessionId)) {
+			setSessionId(sessionId);
+			cookieSet.removeCookie("zsessionid");
+		}
+		String nodeId = cookieSet.getValue("znodeid");
+		if (StringUtils.isNotBlank(nodeId)) {
+			setNodeId(nodeId);
+			cookieSet.removeCookie("znodeid");
+		}
+		this.cookieSet = cookieSet;
+	}
 
 }
