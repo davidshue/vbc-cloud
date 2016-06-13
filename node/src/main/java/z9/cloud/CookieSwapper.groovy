@@ -45,6 +45,7 @@ class CookieSwapper {
 							cookieStore.get(z9sessionid, new CookieSet()).removeCookie(nv[0])
 						}
 						if (nv[0] && nv[1]) {
+							cookieStore.get(z9sessionid, new CookieSet()).removeCookie(nv[0])
 							cookieStore.get(z9sessionid, new CookieSet()).addCookie(new Cookie(nv[0], nv[1]))
 						}
 					}
