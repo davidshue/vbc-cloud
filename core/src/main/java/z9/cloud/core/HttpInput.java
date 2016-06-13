@@ -16,6 +16,8 @@ public class HttpInput implements Serializable {
 	private String uri;
 	private String httpversion;
 	private CookieSet cookieSet = new CookieSet();
+	private CookieSet secondaryCookieSet = new CookieSet();
+
 	private String sessionId = null;
 	private String nodeId = null;
 	private String origin = null;
@@ -86,6 +88,22 @@ public class HttpInput implements Serializable {
 		cookieSet.removeCookie(name);
 	}
 
+	public CookieSet getSecondaryCookieSet() {
+		return secondaryCookieSet;
+	}
+
+	public void setSecondaryCookieSet(CookieSet cookieSet) {
+		this.secondaryCookieSet= cookieSet;
+	}
+
+	public void addSecondaryCookie(Cookie cookie) {
+		secondaryCookieSet.addCookie(cookie);
+	}
+
+	public void removeSecondaryCookie(String name) {
+		secondaryCookieSet.removeCookie(name);
+	}
+
 	public String getSessionId() {
 		return sessionId;
 	}
@@ -99,6 +117,9 @@ public class HttpInput implements Serializable {
 		writer.println(title + "\r");
 		if (!cookieSet.getCookies().isEmpty()) {
 			writer.println("Cookie: " + cookieSet.toString() + "\r");
+		}
+		if (!secondaryCookieSet.getCookies().isEmpty()) {
+			writer.println("Cookie: " + secondaryCookieSet.toString() + "\r");
 		}
 		out.write(payload);
 		writer.println("\r");
