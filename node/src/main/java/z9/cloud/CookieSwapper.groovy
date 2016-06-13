@@ -41,6 +41,9 @@ class CookieSwapper {
 					if (line.contains('=')) {
 						def nv = line.split('=')
 						if (nv[1]) {nv[1] = nv[1].replaceAll('"', '')}
+						if (!nv[1]) {
+							cookieStore.get(z9sessionid, new CookieSet()).removeCookie(nv[0])
+						}
 						if (nv[0] && nv[1]) {
 							cookieStore.get(z9sessionid, new CookieSet()).addCookie(new Cookie(nv[0], nv[1]))
 						}
