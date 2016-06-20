@@ -1,5 +1,7 @@
 package z9.cloud
 
+import com.mongodb.Mongo
+
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.FanoutExchange
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
@@ -17,6 +19,11 @@ class RabbitAppConfig {
 	@Bean
 	String env(Environment env) {
 		env.activeProfiles.length == 0 ? 'default' : env.activeProfiles[0]
+	}
+
+	@Bean
+	Mongo mongo() throws UnknownHostException {
+		new Mongo("localhost")
 	}
 
 	@Bean

@@ -5,14 +5,40 @@ import z9.cloud.core.CookieSet
 import z9.cloud.core.HttpInput
 import z9.cloud.core.HttpOutput
 
-import org.springframework.stereotype.Component
+import javax.annotation.PostConstruct
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.stereotype.Component
 /**
  * Created by dshue1 on 6/12/16.
  */
 @Component
 class CookieSwapper {
+	@Autowired
+	private SessionRepository sessionRepository
+
+	@Autowired
+	private SessionHelper sessionHelper
+
+	@Autowired
+	@Qualifier("env")
+	private String env
+
+	private String nodeId
+
 	private Map<String, CookieSet> cookieStore = [:]
+
+
+	@PostConstruct
+	void afterConstruct() {
+		nodeId = 'node-' + env
+		List<Session> sessions = sessionRepository.findByNodeId(nodeId)
+		sessions.inject(cookieStore) {result, session ->
+			result[session.zid] = session.cookies
+			result
+		}
+	}
 
 	String swap(HttpInput input) {
 		CookieSet cookieSet = input.cookieSet
@@ -43,10 +69,16 @@ class CookieSwapper {
 						if (nv[1]) {nv[1] = nv[1].replaceAll('"', '')}
 						if (!nv[1]) {
 							cookieStore.get(z9sessionid, new CookieSet()).removeCookie(nv[0])
+
+							// Asynchrously talk to mongodb to persist the session info
+							sessionHelper.handleSessionsByNodeIdAndZid(nodeId, z9sessionid, cookieStore.get(z9sessionid))
 						}
 						if (nv[0] && nv[1]) {
 							cookieStore.get(z9sessionid, new CookieSet()).removeCookie(nv[0])
 							cookieStore.get(z9sessionid, new CookieSet()).addCookie(new Cookie(nv[0], nv[1]))
+
+							// Asynchrously talk to mongodb to persist the session info
+							sessionHelper.handleSessionsByNodeIdAndZid(nodeId, z9sessionid, cookieStore.get(z9sessionid))
 						}
 					}
 				}
