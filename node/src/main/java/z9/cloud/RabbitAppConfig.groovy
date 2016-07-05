@@ -1,7 +1,5 @@
 package z9.cloud
 
-import com.mongodb.Mongo
-
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.FanoutExchange
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
@@ -21,10 +19,29 @@ class RabbitAppConfig {
 		env.activeProfiles.length == 0 ? 'default' : env.activeProfiles[0]
 	}
 
+	/*
 	@Bean
-	Mongo mongo() throws UnknownHostException {
-		new Mongo("localhost")
+	MongoClientFactoryBean mongo() {
+		MongoClientFactoryBean mongo = new MongoClientFactoryBean()
+		mongo.host = 'localhost'
+		//mongo.credentials = MongoCredential.createCredential('root', 'admin', 'password')
+		return mongo
+		//MongoAuthority ma = MongoAuthority.direct(new ServerAddress('localhost'),
+		//MongoCredential.createCredential('root', 'admin', 'password'))
+		//new Mongo(ma, null)
 	}
+	*/
+
+	/*
+	@Bean MongoDbFactory mongoDbFactory() throws Exception {
+		UserCredentials userCredentials = new UserCredentials("z9user", "password");
+		return new SimpleMongoDbFactory(new Mongo('localhost'), "vbc", userCredentials);
+	}
+
+	@Bean MongoTemplate mongoTemplate() throws Exception {
+		return new MongoTemplate(mongoDbFactory());
+	}
+	*/
 
 	@Bean
 	connectionFactory(@Value('${spring.rabbitmq.addresses}') String addresses,
