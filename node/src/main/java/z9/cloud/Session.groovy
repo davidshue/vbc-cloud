@@ -1,5 +1,6 @@
 package z9.cloud
 
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import groovy.transform.TupleConstructor
 import z9.cloud.core.CookieSet
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document
  */
 @ToString(includeNames = true, includePackage = false, ignoreNulls = true)
 @TupleConstructor(excludes = ['id'])
+@EqualsAndHashCode(includes = ['id'])
 @Document(collection = 'session')
 class Session {
 	@Id
@@ -21,7 +23,9 @@ class Session {
 
 	String zid
 
-	CookieSet cookies
+	CookieSet cookies = new CookieSet()
+
+	Date createDate = new Date()
 
 	String getId() {
 		return id

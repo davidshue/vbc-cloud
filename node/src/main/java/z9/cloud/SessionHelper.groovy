@@ -1,7 +1,5 @@
 package z9.cloud
 
-import z9.cloud.core.CookieSet
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
@@ -13,11 +11,37 @@ class SessionHelper {
 	@Autowired
 	private SessionRepository sessionRepository
 
+	private Object mutex = new Object()
+
 	@Async
-	void handleSessionsByNodeIdAndZid(String nodeId, String zid, CookieSet cookieSet) {
-		sessionRepository.deleteByNodeIdAndZid(nodeId, zid)
-		if (cookieSet?.cookies) {
-			sessionRepository.save(new Session(nodeId, zid, cookieSet))
+	void handleSessionsByNodeIdAndZid(Session session) {
+		if (!session) return
+		sessionRepository.deleteByNodeIdAndZid(session.nodeId, session.zid)
+		if (session.cookies?.cookies) {
+			sessionRepository.save(session)
 		}
+	}
+
+	/**
+	 * This is to keep the session active in mongoDB. All sessions in MongoDB has a lifetime of 30 min (inactivity
+	 * will cause the session to be purged by mongo). By renewing (updating the createDate), active action could
+	 * potentially be extended)
+	 * @param cookieStore
+	 * @param original
+	 */
+	@Async
+	void renewSessionLease(Map<String, Session> cookieStore, Session original) {
+		if (!cookieStore?.get(original.zid) || !original) return
+
+		synchronized (mutex) {
+			Session currentSession = cookieStore[original.zid]
+			if (currentSession != original) return
+
+			if (System.currentTimeMillis() - currentSession.createDate.time >= 15000) {
+				currentSession.createDate = new Date()
+				sessionRepository.save(currentSession)
+			}
+		}
+
 	}
 }

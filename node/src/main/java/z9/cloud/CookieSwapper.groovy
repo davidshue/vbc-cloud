@@ -27,17 +27,14 @@ class CookieSwapper {
 
 	private String nodeId
 
-	private Map<String, CookieSet> cookieStore = [:]
+	private Map<String, Session> cookieStore = [:]
 
 
 	@PostConstruct
 	void afterConstruct() {
 		nodeId = 'node-' + env
 		List<Session> sessions = sessionRepository.findByNodeId(nodeId)
-		sessions.inject(cookieStore) {result, session ->
-			result[session.zid] = session.cookies
-			result
-		}
+		cookieStore = sessions.collectEntries {[it.zid, it]}
 	}
 
 	String swap(HttpInput input) {
@@ -46,10 +43,11 @@ class CookieSwapper {
 		println 'sessionid: ' + z9sessionid
 		if (!z9sessionid) return null
 
-		CookieSet nodeCookieSet = cookieStore[z9sessionid]
-		if (nodeCookieSet) {
-			println 'nodeCookieSet ' + nodeCookieSet
-			input.secondaryCookieSet = nodeCookieSet
+		Session session = cookieStore[z9sessionid]
+		if (session) {
+			println 'nodeCookieSet ' + session.cookies
+			input.secondaryCookieSet = session.cookies
+			sessionHelper.renewSessionLease(cookieStore, session)
 		}
 		return z9sessionid
 	}
@@ -68,17 +66,17 @@ class CookieSwapper {
 						def nv = line.split('=')
 						if (nv[1]) {nv[1] = nv[1].replaceAll('"', '')}
 						if (!nv[1]) {
-							cookieStore.get(z9sessionid, new CookieSet()).removeCookie(nv[0])
+							cookieStore.get(z9sessionid, new Session(nodeId: nodeId, zid: z9sessionid)).cookies.removeCookie(nv[0])
 
 							// Asynchrously talk to mongodb to persist the session info
-							sessionHelper.handleSessionsByNodeIdAndZid(nodeId, z9sessionid, cookieStore.get(z9sessionid))
+							sessionHelper.handleSessionsByNodeIdAndZid(cookieStore.get(z9sessionid))
 						}
 						if (nv[0] && nv[1]) {
-							cookieStore.get(z9sessionid, new CookieSet()).removeCookie(nv[0])
-							cookieStore.get(z9sessionid, new CookieSet()).addCookie(new Cookie(nv[0], nv[1]))
+							cookieStore.get(z9sessionid, new Session(nodeId: nodeId, zid: z9sessionid)).cookies.removeCookie(nv[0])
+							cookieStore.get(z9sessionid).cookies.addCookie(new Cookie(nv[0], nv[1]))
 
 							// Asynchrously talk to mongodb to persist the session info
-							sessionHelper.handleSessionsByNodeIdAndZid(nodeId, z9sessionid, cookieStore.get(z9sessionid))
+							sessionHelper.handleSessionsByNodeIdAndZid(cookieStore.get(z9sessionid))
 						}
 					}
 				}
@@ -87,4 +85,5 @@ class CookieSwapper {
 		}
 
 	}
+
 }
