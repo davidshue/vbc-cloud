@@ -25,3 +25,12 @@ spring:
 #          uri: file://${user.home}/config-repo
           uri: https://github.com/davidshue/config-repo
           basedir: target/config
+security:
+  basic:
+    enabled: true
+    path: /**
+    real: vbc
+  user:
+    name: admin
+    password: s3cret
+    role: USER

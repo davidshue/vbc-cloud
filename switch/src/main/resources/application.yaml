@@ -5,6 +5,12 @@ spring:
     addresses: localhost
     username: guest
     password: guest
+threadpool:
+  queue:
+    size:
+      core: 50
+      max: 100
+      capacity: 2000
 hystrix:
   command:
     default:
