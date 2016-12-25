@@ -7,10 +7,10 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.SimpleHttpConnectionManager;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,8 +62,12 @@ class EventProcessor {
     }
 
 
-    public void processHttp(Message msg) {
-        logger.info(msg);
+    public void processHttp(HttpInput input) {
+        logger.info(input.getOrigin());
+        if (StringUtils.equals(input.getOrigin(), nodeId)) {
+            return;
+        }
+        executeHttp(input);
     }
 
     public HttpOutput executeHttp(HttpInput content) {
