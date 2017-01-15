@@ -2,6 +2,7 @@ package z9.cloud.core2
 
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import org.apache.http.Header
 import org.apache.http.message.BasicHeader
 
 /**
@@ -16,5 +17,9 @@ class Z9Header implements Serializable {
 
     BasicHeader toBasicHeader() {
         new BasicHeader(name, value)
+    }
+
+    static Z9Header toZ9Header(Header input) {
+        new Z9Header(name: input.name, value: input.value)
     }
 }

@@ -18,4 +18,8 @@ class Z9ProtocolVersion {
     ProtocolVersion toProtocolVersion() {
         new ProtocolVersion(protocol, major, minor)
     }
+
+    static Z9ProtocolVersion toZ9ProtocolVersion(ProtocolVersion input) {
+        new Z9ProtocolVersion(protocol: input.protocol, major: input.major, minor: input.minor)
+    }
 }
