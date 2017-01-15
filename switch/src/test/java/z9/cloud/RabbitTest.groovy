@@ -1,8 +1,5 @@
 package z9.cloud
 
-import z9.cloud.core.HttpInput
-import z9.cloud.core.HttpMethod
-
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
@@ -13,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import z9.cloud.core2.Z9Header
+import z9.cloud.core2.Z9HttpRequest
+import z9.cloud.core2.Z9ProtocolVersion
+import z9.cloud.core2.Z9RequestLine
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=RabbitTestAppConfig.class)
@@ -32,7 +33,10 @@ class RabbitTest {
 		def json = gson.toJson(payload)
 		println json
 
-		HttpInput input = new HttpInput(origin: 'this', method: HttpMethod.GET)
+		Z9HttpRequest input = new Z9HttpRequest(
+				headers: [new Z9Header(name: 'header1', value: 'value1'), new Z9Header(name: 'header2', value: 'value2')],
+				requestLine: new Z9RequestLine(method: 'post', uri: '/www.cnn.com', protocolVersion: new Z9ProtocolVersion(protocol: 'https', major: 1, minor: 1))
+		)
 
 		template.convertAndSend("http_exchange", 'broadcast', input)
 

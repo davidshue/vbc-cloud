@@ -10,8 +10,9 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestTemplate
-import z9.cloud.core.Input
-import z9.cloud.core.Output
+import z9.cloud.core2.Input
+import z9.cloud.core2.Output
+
 
 /**
  * Created by dshue1 on 3/15/16.
