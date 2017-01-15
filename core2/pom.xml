@@ -12,7 +12,7 @@
 	<description>core library for vbc cloud</description>
 
 	<properties>
-		<maven.test.skip>true</maven.test.skip>
+		<!--<maven.test.skip>true</maven.test.skip>-->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<groovy.version>2.4.6</groovy.version>
 	</properties>
