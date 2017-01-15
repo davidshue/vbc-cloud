@@ -2,6 +2,7 @@ package z9.cloud.core2;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
@@ -37,7 +38,7 @@ public class HttpRetry {
                     logger.info("receiveRequestHeader " + count + " times");
                 }
                 return conn.receiveRequestHeader();
-            } catch (SocketTimeoutException e) {
+            } catch (SocketTimeoutException|ConnectionClosedException e) {
                 if (count >= retries) {
                     throw e;
                 }
@@ -54,7 +55,7 @@ public class HttpRetry {
                     logger.info("receiveResponseHeader " + count + " times");
                 }
                 return activeConn.receiveResponseHeader();
-            } catch (SocketTimeoutException e) {
+            } catch (SocketTimeoutException|ConnectionClosedException e) {
                 if (count >= retries) {
                     throw e;
                 }
@@ -72,7 +73,7 @@ public class HttpRetry {
                     logger.info("toByteArray " + count + " times");
                 }
                 return EntityUtils.toByteArray(entity);
-            } catch (SocketTimeoutException e) {
+            } catch (SocketTimeoutException|ConnectionClosedException e) {
                 if (count >= retries) {
                     throw e;
                 }
