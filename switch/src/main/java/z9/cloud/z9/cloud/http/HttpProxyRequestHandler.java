@@ -3,6 +3,7 @@ package z9.cloud.z9.cloud.http;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.ConnectionClosedException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -17,9 +18,10 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.DefaultBHttpServerConnection;
 import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import z9.cloud.RequestHandler;
+import z9.cloud.core2.HttpRetry;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,6 +34,9 @@ public class HttpProxyRequestHandler implements RequestHandler {
 	private static Log logger = LogFactory.getLog(HttpProxyRequestHandler.class);
 	
 	private HttpDelegate httpDelegate;
+
+	@Autowired
+    private HttpRetry httpRetry;
 
 	public HttpProxyRequestHandler(HttpDelegate httpDelegate) {
 		this.httpDelegate = httpDelegate;
@@ -46,7 +51,7 @@ public class HttpProxyRequestHandler implements RequestHandler {
 			boolean keepAlive = true;
 			while( keepAlive && !socket.isClosed() ) {
 				// fully read the request, whatever it is
-				HttpRequest request = conn.receiveRequestHeader();
+				HttpRequest request = httpRetry.receiveRequestHeader(conn);
 				logger.info("Received request: {0} " + request);
 				keepAlive = isKeepAlive(request);
 
@@ -58,7 +63,7 @@ public class HttpProxyRequestHandler implements RequestHandler {
 							.getEntity();
 					if (entity != null) {
 						// consume all content to allow reuse
-                        byte[] bytes = EntityUtils.toByteArray(entity);
+                        byte[] bytes = httpRetry.toByteArray(entity);
                         ContentType type = ContentType.parse(entity.getContentType().getValue());
                         HttpEntity byteEntity = new ByteArrayEntity(bytes, type);
 						((HttpEntityEnclosingRequest) request).setEntity(byteEntity);
@@ -81,16 +86,14 @@ public class HttpProxyRequestHandler implements RequestHandler {
                 conn.flush();
 			}
 
-		} catch (SocketException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+		} catch (SocketException|ConnectionClosedException e) {
+			logger.warn(e.getMessage());
 		} catch (Exception e) {
 		    logger.error(e.getMessage(), e);
 		}
 		finally {
 			IOUtils.closeQuietly(conn);
-			IOUtils.closeQuietly(socket);
+			//IOUtils.closeQuietly(socket);
 			logger.debug("Connection Closed ...");
 		}
 	}

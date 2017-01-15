@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
+import z9.cloud.core2.HttpRetry
 
 @Configuration
 class RabbitAppConfig {
@@ -81,5 +82,10 @@ class RabbitAppConfig {
 			txSize: 10,
 			messageListener: new MessageListenerAdapter(processor, 'processHttp')
 		)
+	}
+
+	@Bean
+	HttpRetry httpRetry() {
+		new HttpRetry()
 	}
 }

@@ -1,7 +1,5 @@
 package z9.cloud
 
-import z9.cloud.core.CookieSet
-
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,11 +16,11 @@ public class NodeApplicationTests {
 
 	@Test
 	public void test() {
-		sessionRepository.save(new Session('node-fake', 'abc123', new CookieSet('abc=123')))
+		//sessionRepository.save(new Session('node-fake', 'abc123', new CookieSet('abc=123')))
 
 		assertEquals 1, sessionRepository.findByNodeId('node-fake').size()
 
-		sessionRepository.save(new Session('node-fake', 'abc789', new CookieSet('abc=234')))
+		//sessionRepository.save(new Session('node-fake', 'abc789', new CookieSet('abc=234')))
 
 		assertEquals 2, sessionRepository.findByNodeId('node-fake').size()
 

@@ -1,15 +1,10 @@
 package z9.cloud
 
-import z9.cloud.core.Cookie
-import z9.cloud.core.CookieSet
-import z9.cloud.core.HttpInput
-import z9.cloud.core.HttpOutput
-
-import javax.annotation.PostConstruct
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
+
+import javax.annotation.PostConstruct
 /**
  * Created by dshue1 on 6/12/16.
  */
@@ -36,7 +31,7 @@ class CookieSwapper {
 		List<Session> sessions = sessionRepository.findByNodeId(nodeId)
 		cookieStore = sessions.collectEntries {[it.zid, it]}
 	}
-
+/*
 	String swap(HttpInput input) {
 		CookieSet cookieSet = input.cookieSet
 		String z9sessionid = cookieSet.getValue('z9sessionid')
@@ -85,5 +80,5 @@ class CookieSwapper {
 		}
 
 	}
-
+*/
 }

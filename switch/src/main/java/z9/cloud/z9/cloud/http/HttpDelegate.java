@@ -1,40 +1,50 @@
 package z9.cloud.z9.cloud.http;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.DefaultBHttpClientConnection;
-import org.apache.http.util.EntityUtils;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import z9.cloud.core2.HttpRetry;
+import z9.cloud.core2.Z9HttpRequest;
+import z9.cloud.core2.Z9HttpResponse;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketAddress;
 
 /**
  * Created by dshue1 on 3/14/16.
  */
 class HttpDelegate {
+	private static Log logger = LogFactory.getLog(HttpDelegate.class);
 	@Autowired
 	private NodeService nodeService;
 
-	HttpResponse handle(HttpRequest request) throws IOException, HttpException {
-		// TODO: real thing
-		//nodeService.httpV1(input)
+	@Autowired
+	private HttpRetry httpRetry;
 
+	private SocketAddress endpoint;
+
+	@PostConstruct
+	public void afterInit() {
+		endpoint = new InetSocketAddress("appazure.zeronines.net", 8080);
+
+	}
+
+	public HttpResponse handle(HttpRequest request) throws IOException, HttpException {
+		// TODO: real thing
+		Z9HttpResponse z9Resposne = nodeService.httpV1(Z9HttpRequest.toZ9HttpRequest(request));
+		return z9Resposne.toBasicHttpResponse();
+
+		/*
 		Socket socket = null;
 		DefaultBHttpClientConnection activeConn = null;
 		try {
-			SocketAddress endpoint = new InetSocketAddress("appazure.zeronines.net", 8080);
-
 			socket = new Socket();
-			socket.connect(endpoint, 2000);
-
+			socket.connect(endpoint, 120000);
 			activeConn = new DefaultBHttpClientConnection(8192);
 			activeConn.bind(socket);
 			activeConn.setSocketTimeout(1000);
@@ -46,22 +56,23 @@ class HttpDelegate {
 			}
 			activeConn.flush();
 
-			HttpResponse response = activeConn.receiveResponseHeader();
+			HttpResponse response = httpRetry.receiveResponseHeader(activeConn);
 
 			activeConn.receiveResponseEntity(response);
 
-			byte[] bytes = EntityUtils.toByteArray(response.getEntity());
-			//ContentType type = ContentType.parse(response.getEntity().getContentType().getValue());
+			byte[] bytes = httpRetry.toByteArray(response.getEntity());
+
 			HttpEntity entity = new ByteArrayEntity(bytes);
 			response.setEntity(entity);
-			//EntityUtils.consume(response.getEntity());
 
 
+			logger.info("Received response: {0} " + response);
 			return response;
 
 		} finally {
 			IOUtils.closeQuietly(activeConn);
 			IOUtils.closeQuietly(socket);
 		}
+		*/
 	}
 }
