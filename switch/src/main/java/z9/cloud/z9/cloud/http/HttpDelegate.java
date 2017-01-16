@@ -1,19 +1,18 @@
 package z9.cloud.z9.cloud.http;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import z9.cloud.core2.HttpRetry;
 import z9.cloud.core2.Z9HttpRequest;
 import z9.cloud.core2.Z9HttpResponse;
+import z9.cloud.core2.Z9HttpUtils;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
+import java.util.UUID;
 
 /**
  * Created by dshue1 on 3/14/16.
@@ -23,21 +22,24 @@ class HttpDelegate {
 	@Autowired
 	private NodeService nodeService;
 
-	@Autowired
-	private HttpRetry httpRetry;
-
-	private SocketAddress endpoint;
-
-	@PostConstruct
-	public void afterInit() {
-		endpoint = new InetSocketAddress("appazure.zeronines.net", 8080);
-
-	}
-
 	public HttpResponse handle(HttpRequest request) throws IOException, HttpException {
 		// TODO: real thing
-		Z9HttpResponse z9Resposne = nodeService.httpV1(Z9HttpRequest.toZ9HttpRequest(request));
-		return z9Resposne.toBasicHttpResponse();
+		String zid = Z9HttpUtils.getZ9SessionId(request);
+		boolean woZid = StringUtils.isBlank(zid);
+		String newZid = "";
+		if (StringUtils.isBlank(zid)) {
+			newZid = UUID.randomUUID().toString();
+			Z9HttpUtils.addZ9SessionIdToRequest(request, newZid);
+		}
+
+		Z9HttpResponse z9Response = nodeService.httpV1(Z9HttpRequest.toZ9HttpRequest(request));
+		HttpResponse response = z9Response.toBasicHttpResponse();
+
+		if (woZid) {
+			Z9HttpUtils.addZ9SessionIdToResponse(response, newZid);
+		}
+
+		return response;
 
 		/*
 		Socket socket = null;

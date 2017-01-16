@@ -56,7 +56,6 @@ public class HttpProxyRequestHandler implements RequestHandler {
 				keepAlive = isKeepAlive(request);
 
 
-
 				if (request instanceof HttpEntityEnclosingRequest) {
 					conn.receiveRequestEntity((HttpEntityEnclosingRequest) request);
 					HttpEntity entity = ((HttpEntityEnclosingRequest) request)
