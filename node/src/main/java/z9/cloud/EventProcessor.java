@@ -11,7 +11,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.DefaultBHttpClientConnection;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,9 +56,6 @@ class EventProcessor {
     private HttpRetry httpRetry;
 
     private SocketAddress endpoint;
-
-    @Autowired
-    private AmqpTemplate template;
 
     @PostConstruct
     public void afterInit() {
