@@ -17,6 +17,8 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by david on 1/18/17.
  */
@@ -58,6 +60,10 @@ public class HttpCoreTest {
                 })
                 .build();
         HttpGet httpget = new HttpGet("https://www.google.com");
+
+        System.out.println(httpget.getProtocolVersion());
+        assertEquals("https://www.google.com", httpget.getURI().toString());
+
         CloseableHttpResponse response = httpclient.execute(httpget);
         for (Header header : response.getAllHeaders()) {
             System.out.println(header.toString());

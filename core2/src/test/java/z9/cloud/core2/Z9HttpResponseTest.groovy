@@ -6,7 +6,7 @@ import org.apache.http.message.BasicHeader
 import org.apache.http.message.BasicHttpResponse
 import org.junit.Test
 
-import static junit.framework.Assert.assertEquals
+import static org.junit.Assert.*
 /**
  * Created by david on 1/12/17.
  */
