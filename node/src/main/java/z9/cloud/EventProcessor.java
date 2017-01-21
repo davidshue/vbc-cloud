@@ -71,7 +71,7 @@ class EventProcessor {
                     if (StringUtils.isBlank(zid)) {
                         String newZid = Z9HttpUtils.randomZ9SessionId();
                         context.setAttribute("newZ9sessionid", newZid);
-                        Z9HttpUtils.addZ9SessionIdToRequest(request, newZid);
+                        //Z9HttpUtils.addZ9SessionIdToRequest(request, newZid);
                     }
                 })
                 .addInterceptorLast((HttpResponse response, HttpContext context) -> {
