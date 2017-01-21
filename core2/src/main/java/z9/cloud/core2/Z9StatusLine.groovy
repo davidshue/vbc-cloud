@@ -10,7 +10,7 @@ import org.apache.http.message.BasicStatusLine
  */
 @EqualsAndHashCode
 @ToString(includeNames = true, includePackage = false, ignoreNulls = true)
-class Z9StatusLine {
+class Z9StatusLine implements Serializable {
     private static final long serialVersionUID = 1L
     Z9ProtocolVersion protocolVersion
     int statusCode

@@ -44,8 +44,8 @@ public class NodeServices {
 
 	@RequestMapping(value = "/v1/http", method=RequestMethod.POST)
 	public Object httpV1(@RequestBody Z9HttpRequest input) throws IOException, HttpException {
-		//input.setOrigin(env);
-		//template.convertAndSend("http_exchange", "broadcast", input);
+		input.setOrigin(env);
+		template.convertAndSend("http_exchange", "broadcast", input);
 		return processor.executeHttp(input);
 	}
 

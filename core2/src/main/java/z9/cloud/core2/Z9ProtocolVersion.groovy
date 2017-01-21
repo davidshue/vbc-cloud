@@ -9,7 +9,7 @@ import org.apache.http.ProtocolVersion
  */
 @EqualsAndHashCode
 @ToString(includeNames = true, includePackage = false, ignoreNulls = true)
-class Z9ProtocolVersion {
+class Z9ProtocolVersion implements Serializable {
     private static final long serialVersionUID = 1L
     String protocol
     int major
