@@ -6,10 +6,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.DefaultBHttpClientConnection;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,9 +61,12 @@ class EventProcessor {
 
     private SocketAddress endpoint;
 
+    private HttpHost httpHost;
+
     @PostConstruct
     public void afterInit() {
         endpoint = new InetSocketAddress(serverAddress, serverPort);
+        httpHost = new HttpHost(serverAddress, serverPort, protocol);
     }
 
 
@@ -73,9 +80,38 @@ class EventProcessor {
 
     public Z9HttpResponse executeHttp(Z9HttpRequest input) throws IOException, HttpException {
         HttpRequest request = input.toBasicHttpRequest();
-        HttpResponse response = handle(request);
+        HttpResponse response = exchange(request);
+
+
 
         return Z9HttpResponse.toZ9HttpResponse(response);
+
+    }
+
+    HttpResponse exchange(HttpRequest request) throws IOException {
+        CloseableHttpClient httpclient = null;
+        CloseableHttpResponse response = null;
+
+        try {
+            httpclient = HttpClients.custom().build();
+
+
+
+            response = httpclient.execute(httpHost, request);
+
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                byte[] bytes = httpRetry.toByteArray(response.getEntity());
+
+                HttpEntity byteArrayEntity = new ByteArrayEntity(bytes);
+                response.setEntity(byteArrayEntity);
+            }
+            logger.info("Received response: {0} " + response);
+            return response;
+        } finally {
+            IOUtils.closeQuietly(httpclient);
+            IOUtils.closeQuietly(response);
+        }
 
     }
 

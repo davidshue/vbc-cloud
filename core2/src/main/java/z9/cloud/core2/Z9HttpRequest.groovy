@@ -40,7 +40,7 @@ class Z9HttpRequest implements Serializable {
     static Z9HttpRequest toZ9HttpRequest(HttpRequest input) {
         def out = new Z9HttpRequest(requestLine: Z9RequestLine.toZ9RequestLine(input.requestLine))
         out.headers = input.allHeaders.collect {Z9Header.toZ9Header(it)}
-        if (input instanceof BasicHttpEntityEnclosingRequest) {
+        if (input instanceof BasicHttpEntityEnclosingRequest && input.entity) {
             out.content = EntityUtils.toByteArray(input.entity)
         }
         return out

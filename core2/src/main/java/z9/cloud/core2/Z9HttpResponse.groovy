@@ -6,6 +6,7 @@ import org.apache.http.HttpResponse
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.message.BasicHttpResponse
 import org.apache.http.util.EntityUtils
+
 /**
  * Created by david on 1/11/17.
  */
@@ -34,7 +35,10 @@ class Z9HttpResponse implements Serializable {
         def out = new Z9HttpResponse(statusLine: Z9StatusLine.toZ9StatusLine(input.statusLine))
         out.headers = input.allHeaders.collect {Z9Header.toZ9Header(it)}
 
-        out.content = EntityUtils.toByteArray(input.entity)
+        if (input.entity) {
+            out.content = EntityUtils.toByteArray(input.entity)
+        }
+
 
         return out
     }
