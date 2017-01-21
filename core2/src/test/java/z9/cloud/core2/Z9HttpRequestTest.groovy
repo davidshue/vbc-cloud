@@ -2,6 +2,7 @@ package z9.cloud.core2
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.http.HttpRequest
 import org.apache.http.message.BasicHeader
 import org.apache.http.message.BasicHttpEntityEnclosingRequest
 import org.apache.http.message.BasicHttpRequest
@@ -9,8 +10,6 @@ import org.junit.Test
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
-
-
 /**
  * Created by david on 1/11/17.
  */
@@ -54,9 +53,10 @@ class Z9HttpRequestTest {
     @Test
     void testMapping() {
         Z9HttpRequest request = new Z9HttpRequest(
-                headers: [new Z9Header(name: 'header1', value: 'value1'), new Z9Header(name: 'header2', value: 'value2')],
+                headers: [new Z9Header(name: 'header1', value: 'value1'), new Z9Header(name: 'header2', value: 'value2'), new Z9Header(name: 'cookie', value: 'z9sessionid=abcd1234')],
                 requestLine: new Z9RequestLine(method: 'post', uri: '/www.cnn.com', protocolVersion: new Z9ProtocolVersion(protocol: 'https', major: 1, minor: 1))
         )
+
         println request
         def json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(request)
 
@@ -67,6 +67,10 @@ class Z9HttpRequestTest {
         println out
 
         assertEquals request, out
+
+        HttpRequest httpRequest = request.toBasicHttpRequest()
+        Z9HttpRequest finalone = Z9HttpRequest.toZ9HttpRequest(httpRequest)
+        assertEquals 'abcd1234', finalone.z9sessionId
 
         assertTrue(request.toBasicHttpRequest() instanceof BasicHttpRequest)
         assertTrue(out.toBasicHttpRequest() instanceof BasicHttpRequest)

@@ -69,15 +69,6 @@ public class HttpProxyRequestHandler implements RequestHandler {
 					}
 				}
 
-				/*
-				// send static content or reject the method
-				String method = request.getRequestLine().getMethod();
-				if( method.matches("(?i)get|post|put") )
-					sendOkContent(conn);
-				else
-					rejectMethod(conn);
-					*/
-
 				HttpResponse response = handle(request);
 
                 conn.sendResponseHeader(response);
@@ -92,7 +83,6 @@ public class HttpProxyRequestHandler implements RequestHandler {
 		}
 		finally {
 			IOUtils.closeQuietly(conn);
-			//IOUtils.closeQuietly(socket);
 			logger.debug("Connection Closed ...");
 		}
 	}

@@ -10,7 +10,7 @@ import org.apache.http.util.EntityUtils
 /**
  * Created by david on 1/10/17.
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(excludes = ['origin', 'z9sessionId'])
 @ToString(includeNames = true, includePackage = false, ignoreNulls = true)
 class Z9HttpRequest implements Serializable {
     private static final long serialVersionUID = 1L
@@ -20,8 +20,11 @@ class Z9HttpRequest implements Serializable {
     Z9Header[] headers = []
 
     String origin
+    String z9sessionId
 
     byte[] content = null
+
+
 
     BasicHttpRequest toBasicHttpRequest() {
         def out
@@ -39,6 +42,7 @@ class Z9HttpRequest implements Serializable {
 
     static Z9HttpRequest toZ9HttpRequest(HttpRequest input) {
         def out = new Z9HttpRequest(requestLine: Z9RequestLine.toZ9RequestLine(input.requestLine))
+        out.z9sessionId = Z9HttpUtils.getZ9SessionId(input)
         out.headers = input.allHeaders.collect {Z9Header.toZ9Header(it)}
         if (input instanceof BasicHttpEntityEnclosingRequest && input.entity) {
             out.content = EntityUtils.toByteArray(input.entity)

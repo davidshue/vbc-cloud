@@ -33,6 +33,7 @@ public class HttpCoreTest {
                     CookieSpec spec = clientContext.getCookieSpec();
                     System.out.println(spec);
                     System.out.println("Right before HTTP call");
+                    context.setAttribute("needZ9sessionid", "1");
                     //AtomicInteger count = (AtomicInteger) context.getAttribute("count");
                     //request.addHeader("Count", Integer.toString(count.getAndIncrement()));
                 })
@@ -41,6 +42,9 @@ public class HttpCoreTest {
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
                     CookieOrigin origin = clientContext.getCookieOrigin();
                     System.out.println(origin);
+                    System.out.println(origin.getHost());
+
+                    System.out.println("needZ9sessionid :" + context.getAttribute("needZ9sessionid"));
                     CookieSpec spec = clientContext.getCookieSpec();
 
                     for (Header header : response.getHeaders("Set-Cookie")) {

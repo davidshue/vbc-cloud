@@ -4,16 +4,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.DefaultBHttpClientConnection;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.protocol.HttpContext;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,12 +23,10 @@ import org.springframework.stereotype.Component;
 import z9.cloud.core2.HttpRetry;
 import z9.cloud.core2.Z9HttpRequest;
 import z9.cloud.core2.Z9HttpResponse;
+import z9.cloud.core2.Z9HttpUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 
 @Component
 class EventProcessor {
@@ -59,14 +57,53 @@ class EventProcessor {
     @Autowired
     private HttpRetry httpRetry;
 
-    private SocketAddress endpoint;
 
     private HttpHost httpHost;
 
+    CloseableHttpClient httpClient;
+
     @PostConstruct
     public void afterInit() {
-        endpoint = new InetSocketAddress(serverAddress, serverPort);
         httpHost = new HttpHost(serverAddress, serverPort, protocol);
+        httpClient = HttpClients.custom()
+                .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
+                    String zid = Z9HttpUtils.getZ9SessionId(request);
+                    if (StringUtils.isBlank(zid)) {
+                        String newZid = Z9HttpUtils.randomZ9SessionId();
+                        context.setAttribute("newZ9sessionid", newZid);
+                        Z9HttpUtils.addZ9SessionIdToRequest(request, newZid);
+                    }
+                })
+                .addInterceptorLast((HttpResponse response, HttpContext context) -> {
+
+                    String newZid = (String) context.getAttribute("newZ9sessionid");
+                    if (StringUtils.isNotBlank(newZid)) {
+                        Z9HttpUtils.addZ9SessionIdToResponse(response, newZid);
+                    }
+            /*
+                    HttpClientContext clientContext = HttpClientContext.adapt(context);
+                    CookieOrigin origin = clientContext.getCookieOrigin();
+                    System.out.println(origin);
+
+                    System.out.println("needZ9sessionid :" + context.getAttribute("needZ9sessionid"));
+                    CookieSpec spec = clientContext.getCookieSpec();
+
+                    for (Header header : response.getHeaders("Set-Cookie")) {
+                        spec.parse(header, origin).forEach(cookie -> {
+                            System.out.println("name: " + cookie.getName());
+                            System.out.println("value: " + cookie.getValue());
+                            System.out.println("domain: " + cookie.getDomain());
+                            System.out.println("expiry: " + cookie.getExpiryDate());
+                            System.out.println("path: " + cookie.getPath());
+                            System.out.println("comment: " + cookie.getComment());
+                            System.out.println("port: " + cookie.getPorts());
+                            System.out.println("version: " + cookie.getVersion());
+                        });
+                    }
+                    System.out.println(spec);
+                    System.out.println("Right after HTTP returns");
+                    */
+                }).build();
     }
 
 
@@ -89,15 +126,10 @@ class EventProcessor {
     }
 
     HttpResponse exchange(HttpRequest request) throws IOException {
-        CloseableHttpClient httpclient = null;
         CloseableHttpResponse response = null;
 
         try {
-            httpclient = HttpClients.custom().build();
-
-
-
-            response = httpclient.execute(httpHost, request);
+            response = httpClient.execute(httpHost, request);
 
             HttpEntity entity = response.getEntity();
             if (entity != null) {
@@ -109,47 +141,11 @@ class EventProcessor {
             logger.info("Received response: {0} " + response);
             return response;
         } finally {
-            IOUtils.closeQuietly(httpclient);
             IOUtils.closeQuietly(response);
         }
 
     }
 
-    HttpResponse handle(HttpRequest request) throws IOException, HttpException {
-        Socket socket = null;
-        DefaultBHttpClientConnection activeConn = null;
-        try {
-            socket = new Socket();
-            socket.connect(endpoint, 120000);
-            activeConn = new DefaultBHttpClientConnection(8192);
-            activeConn.bind(socket);
-            activeConn.setSocketTimeout(1000);
-
-
-            activeConn.sendRequestHeader(request);
-            if (request instanceof HttpEntityEnclosingRequest) {
-                activeConn.sendRequestEntity((HttpEntityEnclosingRequest)request);
-            }
-            activeConn.flush();
-
-            HttpResponse response = httpRetry.receiveResponseHeader(activeConn);
-
-            activeConn.receiveResponseEntity(response);
-
-            byte[] bytes = httpRetry.toByteArray(response.getEntity());
-
-            HttpEntity entity = new ByteArrayEntity(bytes);
-            response.setEntity(entity);
-
-
-            logger.info("Received response: {0} " + response);
-            return response;
-
-        } finally {
-            IOUtils.closeQuietly(activeConn);
-            IOUtils.closeQuietly(socket);
-        }
-    }
 
 
 }
