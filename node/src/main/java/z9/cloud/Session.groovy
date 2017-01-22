@@ -20,7 +20,7 @@ class Session {
 
 	String zid
 
-	//CookieSet cookies = new CookieSet()
+	Map<String, String> cookies = [:]
 
 	Date createDate = new Date()
 

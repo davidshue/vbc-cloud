@@ -1,8 +1,15 @@
 package z9.cloud
 
+import org.apache.http.HttpRequest
+import org.apache.http.HttpResponse
+import org.apache.http.client.protocol.HttpClientContext
+import org.apache.http.cookie.CookieOrigin
+import org.apache.http.cookie.CookieSpec
+import org.apache.http.message.BasicHeader
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
+import z9.cloud.core2.Z9HttpUtils
 
 import javax.annotation.PostConstruct
 /**
@@ -31,54 +38,46 @@ class CookieSwapper {
 		List<Session> sessions = sessionRepository.findByNodeId(nodeId)
 		cookieStore = sessions.collectEntries {[it.zid, it]}
 	}
-/*
-	String swap(HttpInput input) {
-		CookieSet cookieSet = input.cookieSet
-		String z9sessionid = cookieSet.getValue('z9sessionid')
+
+	String swap(HttpRequest input) {
+		String z9sessionid = Z9HttpUtils.getZ9SessionId(input)
 		println 'sessionid: ' + z9sessionid
 		if (!z9sessionid) return null
 
 		Session session = cookieStore[z9sessionid]
 		if (session) {
-			println 'nodeCookieSet ' + session.cookies
-			input.secondaryCookieSet = session.cookies
+			println 'nodeCookies ' + session.cookies
+			input.removeHeaders('Cookie')
+			session.cookies.each {k, v ->
+				input.addHeader(new BasicHeader('Cookie', "$k=$v"))
+			}
 			sessionHelper.renewSessionLease(cookieStore, session)
 		}
 		return z9sessionid
 	}
 
-	void mediate(String z9sessionid, HttpOutput output) {
-		if (!z9sessionid) return
+	void mediate(String z9sessionid, HttpResponse output, HttpClientContext context) {
+		if (!z9sessionid || !output.getHeaders('Set-Cookie')) return
+        CookieOrigin cookieOrigin = context.cookieOrigin
+        CookieSpec cookieSpec = context.cookieSpec
 
-		println output.cookies
-		if (output.cookies) {
-			output.cookies.each {
-				def setcookies =  it.substring(it.indexOf(':') + 2).split(',')
-				setcookies.each {sc ->
-					String line = sc.substring(0, sc.indexOf(';'))
-					println line
-					if (line.contains('=')) {
-						def nv = line.split('=')
-						if (nv[1]) {nv[1] = nv[1].replaceAll('"', '')}
-						if (!nv[1]) {
-							cookieStore.get(z9sessionid, new Session(nodeId: nodeId, zid: z9sessionid)).cookies.removeCookie(nv[0])
+        output.getHeaders('Set-Cookie').each {header ->
+            cookieSpec.parse(header, cookieOrigin).each {cookie ->
+                if (cookie.name != Z9HttpUtils.Z9_SESSION_ID) {
+                    if (cookie.value) {
+                        cookieStore.get(z9sessionid, new Session(nodeId: nodeId, zid: z9sessionid)).cookies[cookie.name] = cookie.value
+                    }
+                    else {
+                        cookieStore.get(z9sessionid)?.cookies.remove(cookie.name)
+                    }
+                }
 
-							// Asynchrously talk to mongodb to persist the session info
-							sessionHelper.handleSessionsByNodeIdAndZid(cookieStore.get(z9sessionid))
-						}
-						if (nv[0] && nv[1]) {
-							cookieStore.get(z9sessionid, new Session(nodeId: nodeId, zid: z9sessionid)).cookies.removeCookie(nv[0])
-							cookieStore.get(z9sessionid).cookies.addCookie(new Cookie(nv[0], nv[1]))
+            }
+        }
+        sessionHelper.handleSessionsByNodeIdAndZid(cookieStore.get(z9sessionid))
 
-							// Asynchrously talk to mongodb to persist the session info
-							sessionHelper.handleSessionsByNodeIdAndZid(cookieStore.get(z9sessionid))
-						}
-					}
-				}
-			}
-			println cookieStore[z9sessionid]
-		}
+        println cookieStore[z9sessionid]
 
 	}
-*/
+
 }

@@ -10,9 +10,11 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,31 +57,61 @@ class EventProcessor {
     private String nodeId = "node1";
 
     @Autowired
+    private CookieSwapper cookieSwapper;
+
+    @Autowired
     private HttpRetry httpRetry;
 
 
     private HttpHost httpHost;
 
-    CloseableHttpClient httpClient;
+    private CloseableHttpClient httpClient;
 
     @PostConstruct
     public void afterInit() {
         httpHost = new HttpHost(serverAddress, serverPort, protocol);
         httpClient = HttpClients.custom()
                 .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
-                    String zid = Z9HttpUtils.getZ9SessionId(request);
-                    if (StringUtils.isBlank(zid)) {
-                        String newZid = Z9HttpUtils.randomZ9SessionId();
-                        context.setAttribute("newZ9sessionid", newZid);
-                        //Z9HttpUtils.addZ9SessionIdToRequest(request, newZid);
+                    request.removeHeaders(HTTP.CONTENT_LEN);
+                    String zsessionId = Z9HttpUtils.getZ9SessionId(request);
+                    if (StringUtils.isBlank(zsessionId)) {
+                        String zid = Z9HttpUtils.getZid(request);
+                        if (StringUtils.isBlank(zid)) {
+                            return;
+                        }
+
+                        context.setAttribute("zid", zid);
+                        context.setAttribute("setZid", Boolean.TRUE);
+                    }
+                    else {
+                        context.setAttribute("zid", zsessionId);
+                        context.setAttribute("setZid", Boolean.FALSE);
+                        cookieSwapper.swap(request);
                     }
                 })
                 .addInterceptorLast((HttpResponse response, HttpContext context) -> {
-
-                    String newZid = (String) context.getAttribute("newZ9sessionid");
-                    if (StringUtils.isNotBlank(newZid)) {
-                        Z9HttpUtils.addZ9SessionIdToResponse(response, newZid);
+                    // nothing to mediate if the status code is not 200
+                    //if (response.getStatusLine().getStatusCode() != 200) {
+                    //    return;
+                    //}
+                    if (response.getHeaders("Set-Cookie").length == 0) {
+                        return;
                     }
+
+                    String z9sessionId = (String) context.getAttribute("zid");
+                    if (StringUtils.isBlank(z9sessionId)) {
+                        return;
+                    }
+
+                    HttpClientContext clientContext = HttpClientContext.adapt(context);
+                    cookieSwapper.mediate(z9sessionId, response, clientContext);
+
+                    boolean setZid = (boolean) context.getAttribute("setZid");
+                    if (setZid && !Z9HttpUtils.isZ9SessionIdSet(response, clientContext)) {
+                        Z9HttpUtils.addZ9SessionIdToResponse(response, z9sessionId);
+                    }
+
+
             /*
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
                     CookieOrigin origin = clientContext.getCookieOrigin();

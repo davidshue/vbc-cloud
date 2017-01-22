@@ -8,6 +8,7 @@ import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import z9.cloud.core2.Z9HttpRequest;
 import z9.cloud.core2.Z9HttpResponse;
+import z9.cloud.core2.Z9HttpUtils;
 
 import java.io.IOException;
 
@@ -20,7 +21,11 @@ class HttpDelegate {
 	private NodeService nodeService;
 
 	public HttpResponse handle(HttpRequest request) throws IOException, HttpException {
-		Z9HttpResponse z9Response = nodeService.httpV1(Z9HttpRequest.toZ9HttpRequest(request));
+		Z9HttpRequest z9Request = Z9HttpRequest.toZ9HttpRequest(request);
+		if (Z9HttpUtils.getZ9SessionId(request) == null) {
+			z9Request.setNewZid(Z9HttpUtils.randomZ9SessionId());
+		}
+		Z9HttpResponse z9Response = nodeService.httpV1(z9Request);
 		HttpResponse response = z9Response.toBasicHttpResponse();
 		return response;
 	}

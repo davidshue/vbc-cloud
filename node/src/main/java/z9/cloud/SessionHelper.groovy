@@ -17,7 +17,7 @@ class SessionHelper {
 	void handleSessionsByNodeIdAndZid(Session session) {
 		if (!session) return
 		sessionRepository.deleteByNodeIdAndZid(session.nodeId, session.zid)
-		if (session.cookies?.cookies) {
+		if (session.cookies) {
 			sessionRepository.save(session)
 		}
 	}
