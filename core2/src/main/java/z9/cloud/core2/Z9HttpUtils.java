@@ -82,4 +82,12 @@ public abstract class Z9HttpUtils {
     public static void addZ9SessionIdToResponse(HttpResponse response, String id) {
         response.addHeader("Set-Cookie", Z9_SESSION_ID + "=" + id + "; path=/; HttpOnly");
     }
+
+    public static String getZid(HttpRequest request) {
+        Header[] headers = request.getHeaders("zid");
+        if (headers == null || headers.length == 0) {
+            return null;
+        }
+        return headers[0].getValue();
+    }
 }
