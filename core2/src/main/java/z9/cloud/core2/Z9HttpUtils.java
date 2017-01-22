@@ -5,7 +5,14 @@ import org.apache.http.HeaderElement;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.cookie.CookieOrigin;
+import org.apache.http.cookie.CookieSpec;
+import org.apache.http.cookie.MalformedCookieException;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -27,6 +34,41 @@ public abstract class Z9HttpUtils {
             }
         }
         return null;
+    }
+
+    public static boolean isZ9SessionIdSet(HttpResponse response, HttpClientContext context)  {
+        CookieOrigin origin = context.getCookieOrigin();
+        CookieSpec spec = context.getCookieSpec();
+
+        for (Header header : response.getHeaders("Set-Cookie")) {
+            try {
+                for (Cookie cookie : spec.parse(header, origin)) {
+                    if (cookie.getName().equals(Z9_SESSION_ID)) {
+                        return true;
+                    }
+                }
+            } catch (MalformedCookieException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+    
+    
+    public static Map<String, String> getAllCookies(HttpRequest request) {
+        Map<String, String> result = new LinkedHashMap<>();
+        Header[] cookies = request.getHeaders("Cookie");
+        for (Header cookie : cookies) {
+            result.put(cookie.getName(), cookie.getValue());
+            for (HeaderElement he : cookie.getElements()) {
+                for (NameValuePair nv : he.getParameters()) {
+                    result.put(nv.getName(), nv.getValue());
+                }
+            }
+        }
+        
+        return result;
     }
 
     public static String randomZ9SessionId() {

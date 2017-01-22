@@ -2,7 +2,6 @@ package z9.cloud.core2
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.http.HttpRequest
 import org.apache.http.message.BasicHeader
 import org.apache.http.message.BasicHttpEntityEnclosingRequest
 import org.apache.http.message.BasicHttpRequest
@@ -68,11 +67,16 @@ class Z9HttpRequestTest {
 
         assertEquals request, out
 
-        HttpRequest httpRequest = request.toBasicHttpRequest()
-        Z9HttpRequest finalone = Z9HttpRequest.toZ9HttpRequest(httpRequest)
-        assertEquals 'abcd1234', finalone.z9sessionId
 
         assertTrue(request.toBasicHttpRequest() instanceof BasicHttpRequest)
         assertTrue(out.toBasicHttpRequest() instanceof BasicHttpRequest)
+
+        BasicHttpRequest httpRequest = request.toBasicHttpRequest()
+        assertEquals 0, httpRequest.getHeaders("zid").length
+
+        request.newZid = 'abc'
+
+        httpRequest = request.toBasicHttpRequest()
+        assertEquals 'abc', httpRequest.getHeaders('zid')[0].value
     }
 }

@@ -13,6 +13,7 @@ import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.CookieSpec;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
@@ -23,6 +24,20 @@ import static org.junit.Assert.assertEquals;
  * Created by david on 1/18/17.
  */
 public class HttpCoreTest {
+    @Test
+    public void testCookie() {
+        Header header = new BasicHeader("Cookie", "z9sessionid=8da7550e-d897-41f2-839d-06e04feddee5; JSESSIONID=79B72C59CDE1D292A8E4D945A946FD2A");
+        System.out.println(header.getName());
+        System.out.println(header.getValue());
+        for (HeaderElement he : header.getElements()) {
+            System.out.println("\t" + he.getName());
+            System.out.println("\t" + he.getValue());
+            for (NameValuePair nv : he.getParameters()) {
+                System.out.println("\t\t" + nv.getName());
+                System.out.println("\t\t" + nv.getValue());
+            }
+        }
+    }
     @Test
     public void testEntity() throws Exception {
         CloseableHttpClient httpclient = HttpClients.custom()
