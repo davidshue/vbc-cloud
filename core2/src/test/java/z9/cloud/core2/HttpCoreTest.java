@@ -1,22 +1,29 @@
 package z9.cloud.core2;
 
+import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.CookieSpec;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -106,5 +113,41 @@ public class HttpCoreTest {
         } finally {
             response.close();
         }
+    }
+
+    @Test
+    public void testPost() throws Exception {
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .addInterceptorLast((HttpResponse response, HttpContext context) -> {
+                    HttpClientContext clientContext = HttpClientContext.adapt(context);
+                    CookieOrigin origin = clientContext.getCookieOrigin();
+                    CookieSpec spec = clientContext.getCookieSpec();
+
+                    for (Header header : response.getHeaders("Set-Cookie")) {
+                        spec.parse(header, origin).forEach(cookie -> {
+                            System.out.println("---------");
+                            System.out.println(cookie.getName());
+                            System.out.println(cookie.getValue());
+                            System.out.println("domain: " + cookie.getDomain());
+                            System.out.println("expiry: " + cookie.getExpiryDate());
+                            System.out.println("path: " + cookie.getPath());
+                            System.out.println("comment: " + cookie.getComment());
+                            System.out.println("port: " + cookie.getPorts());
+                            System.out.println("version: " + cookie.getVersion());
+                        });
+                    }
+                }).build();
+
+        HttpPost httpPost = new HttpPost("http://appazure.zeronines.net:8080/j_spring_security_check");
+        List<NameValuePair> formparams = new ArrayList<>();
+        formparams.add(new BasicNameValuePair("j_username", "demo@demo.com"));
+        formparams.add(new BasicNameValuePair("j_password", "demo"));
+        formparams.add(new BasicNameValuePair("_spring_security_remember_me", "true"));
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);
+        httpPost.setEntity(entity);
+
+        CloseableHttpResponse response = httpclient.execute(httpPost);
+        System.out.println(response.getStatusLine());
+        response.close();
     }
 }
