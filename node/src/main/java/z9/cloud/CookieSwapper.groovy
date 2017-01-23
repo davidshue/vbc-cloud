@@ -52,7 +52,7 @@ class CookieSwapper {
 		if (session) {
 			println 'nodeCookies ' + session.cookies
 			input.removeHeaders('Cookie')
-            String value  = session.cookies.collect {k, v -> "$k=v"}.join(';')
+            String value  = session.cookies.collect {k, v -> "$k=$v"}.join(';')
             input.addHeader(new BasicHeader('Cookie', value))
 
 			sessionHelper.renewSessionLease(cookieStore, session)
