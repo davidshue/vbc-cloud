@@ -1,7 +1,6 @@
 package z9.cloud;
 
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import z9.cloud.core2.Input;
 import z9.cloud.core2.Output;
 import z9.cloud.core2.Z9HttpRequest;
-import z9.cloud.core2.Z9HttpUtils;
 
 import java.io.IOException;
 
@@ -47,9 +45,6 @@ public class NodeServices {
 	@RequestMapping(value = "/v1/http", method=RequestMethod.POST)
 	public Object httpV1(@RequestBody Z9HttpRequest input) throws IOException, HttpException {
 		input.setOrigin(env);
-		if (StringUtils.isBlank(input.getNewZid())) {
-			input.setNewZid(Z9HttpUtils.randomZ9SessionId());
-		}
 		template.convertAndSend("http_exchange", "broadcast", input);
 		return processor.executeHttp(input);
 	}

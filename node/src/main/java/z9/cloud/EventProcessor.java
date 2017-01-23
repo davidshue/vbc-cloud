@@ -94,48 +94,35 @@ class EventProcessor {
                     //if (response.getStatusLine().getStatusCode() != 200) {
                     //    return;
                     //}
+                    HttpClientContext clientContext = HttpClientContext.adapt(context);
+                    logger.info("handling response on " + clientContext.getRequest().getRequestLine());
                     if (response.getHeaders("Set-Cookie").length == 0) {
+                        logger.info("no set-cookie for " + clientContext.getRequest().getRequestLine());
+                        addZ9SessionCookie(response, clientContext);
                         return;
                     }
 
                     String z9sessionId = (String) context.getAttribute("zid");
                     if (StringUtils.isBlank(z9sessionId)) {
+                        logger.info("no zid for " + clientContext.getRequest().getRequestLine());
                         return;
                     }
 
-                    HttpClientContext clientContext = HttpClientContext.adapt(context);
+
                     cookieSwapper.mediate(z9sessionId, response, clientContext);
 
-                    boolean setZid = (boolean) context.getAttribute("setZid");
-                    if (setZid && !Z9HttpUtils.isZ9SessionIdSet(response, clientContext)) {
-                        Z9HttpUtils.addZ9SessionIdToResponse(response, z9sessionId);
-                    }
+                    addZ9SessionCookie(response, clientContext);
 
 
-            /*
-                    HttpClientContext clientContext = HttpClientContext.adapt(context);
-                    CookieOrigin origin = clientContext.getCookieOrigin();
-                    System.out.println(origin);
-
-                    System.out.println("needZ9sessionid :" + context.getAttribute("needZ9sessionid"));
-                    CookieSpec spec = clientContext.getCookieSpec();
-
-                    for (Header header : response.getHeaders("Set-Cookie")) {
-                        spec.parse(header, origin).forEach(cookie -> {
-                            System.out.println("name: " + cookie.getName());
-                            System.out.println("value: " + cookie.getValue());
-                            System.out.println("domain: " + cookie.getDomain());
-                            System.out.println("expiry: " + cookie.getExpiryDate());
-                            System.out.println("path: " + cookie.getPath());
-                            System.out.println("comment: " + cookie.getComment());
-                            System.out.println("port: " + cookie.getPorts());
-                            System.out.println("version: " + cookie.getVersion());
-                        });
-                    }
-                    System.out.println(spec);
-                    System.out.println("Right after HTTP returns");
-                    */
                 }).build();
+    }
+
+    private void addZ9SessionCookie(HttpResponse response, HttpClientContext context) {
+        String z9sessionId = (String) context.getAttribute("zid");
+        boolean setZid = (boolean) context.getAttribute("setZid");
+        if (setZid && !Z9HttpUtils.isZ9SessionIdSet(response, context)) {
+            Z9HttpUtils.addZ9SessionIdToResponse(response, z9sessionId);
+        }
     }
 
 

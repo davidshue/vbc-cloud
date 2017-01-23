@@ -1,5 +1,7 @@
 package z9.cloud
 
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.apache.http.HttpRequest
 import org.apache.http.HttpResponse
 import org.apache.http.client.protocol.HttpClientContext
@@ -17,6 +19,8 @@ import javax.annotation.PostConstruct
  */
 @Component
 class CookieSwapper {
+    private final Log logger = LogFactory.getLog(getClass())
+
 	@Autowired
 	private SessionRepository sessionRepository
 
@@ -48,9 +52,9 @@ class CookieSwapper {
 		if (session) {
 			println 'nodeCookies ' + session.cookies
 			input.removeHeaders('Cookie')
-			session.cookies.each {k, v ->
-				input.addHeader(new BasicHeader('Cookie', "$k=$v"))
-			}
+            String value  = session.cookies.collect {k, v -> "$k=v"}.join(';')
+            input.addHeader(new BasicHeader('Cookie', value))
+
 			sessionHelper.renewSessionLease(cookieStore, session)
 		}
 		return z9sessionid
@@ -64,11 +68,13 @@ class CookieSwapper {
         output.getHeaders('Set-Cookie').each {header ->
             cookieSpec.parse(header, cookieOrigin).each {cookie ->
                 if (cookie.name != Z9HttpUtils.Z9_SESSION_ID) {
-                    if (cookie.value) {
+                    if (cookie.value && cookie.value != '""') {
+                        logger.info("adding $cookie")
                         cookieStore.get(z9sessionid, new Session(nodeId: nodeId, zid: z9sessionid)).cookies[cookie.name] = cookie.value
                     }
                     else {
-                        cookieStore.get(z9sessionid)?.cookies.remove(cookie.name)
+                        logger.info("removing $cookie")
+                        cookieStore.get(z9sessionid)?.cookies?.remove(cookie.name)
                     }
                 }
 
