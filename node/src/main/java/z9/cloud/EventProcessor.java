@@ -101,7 +101,7 @@ class EventProcessor {
 
                     if (response.getHeaders("Set-Cookie").length == 0) {
                         logger.info("no set-cookie for " + clientContext.getRequest().getRequestLine());
-                        addZ9SessionCookie(response, clientContext);
+                        //addZ9SessionCookie(response, clientContext);
                         return;
                     }
 
