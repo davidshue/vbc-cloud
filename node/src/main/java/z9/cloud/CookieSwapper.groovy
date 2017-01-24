@@ -43,16 +43,15 @@ class CookieSwapper {
 		cookieStore = sessions.collectEntries {[it.zid, it]}
 	}
 
-	String swap(HttpRequest input) {
-		String z9sessionid = Z9HttpUtils.getZ9SessionId(input)
+	String swap(HttpRequest input, String z9sessionid) {
 		println 'sessionid: ' + z9sessionid
 		if (!z9sessionid) return null
 
 		Session session = cookieStore[z9sessionid]
-		if (session) {
+		if (session?.cookies) {
 			println 'nodeCookies ' + session.cookies
-			input.removeHeaders('Cookie')
-            String value  = session.cookies.collect {k, v -> "$k=$v"}.join(';')
+            String value  = session.cookies.collect {k, v -> "$k=$v"}.join('; ')
+            logger.info("cookie value: $value")
             input.addHeader(new BasicHeader('Cookie', value))
 
 			sessionHelper.renewSessionLease(cookieStore, session)
@@ -62,6 +61,7 @@ class CookieSwapper {
 
 	void mediate(String z9sessionid, HttpResponse output, HttpClientContext context) {
 		if (!z9sessionid || !output.getHeaders('Set-Cookie')) return
+
         CookieOrigin cookieOrigin = context.cookieOrigin
         CookieSpec cookieSpec = context.cookieSpec
 
@@ -80,10 +80,18 @@ class CookieSwapper {
 
             }
         }
+
         sessionHelper.handleSessionsByNodeIdAndZid(cookieStore.get(z9sessionid))
 
-        println cookieStore[z9sessionid]
+        output.removeHeaders('Set-Cookie')
 
+        if (!cookieStore[z9sessionid]?.cookies) {
+            logger.info("removing $cookieStore.z9sessionid")
+            cookieStore.remove(z9sessionid)
+        }
+        else {
+            logger.info cookieStore[z9sessionid]
+        }
 	}
 
 }
