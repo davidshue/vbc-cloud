@@ -74,9 +74,8 @@ class EventProcessor {
                 .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
                     request.removeHeaders(HTTP.CONTENT_LEN);
                     String zsessionId = Z9HttpUtils.getZ9SessionId(request);
-                    request.removeHeaders("Cookie");
-                    context.setAttribute("setZid", Boolean.FALSE);
 
+                    context.setAttribute("setZid", Boolean.FALSE);
                     if (StringUtils.isBlank(zsessionId)) {
                         String zid = Z9HttpUtils.getZid(request);
                         if (StringUtils.isBlank(zid)) {
@@ -87,7 +86,6 @@ class EventProcessor {
                     }
                     else {
                         context.setAttribute("zid", zsessionId);
-
                         cookieSwapper.swap(request, zsessionId);
                     }
                 })
@@ -99,18 +97,16 @@ class EventProcessor {
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
                     logger.info("handling response on " + clientContext.getRequest().getRequestLine());
 
-                    if (response.getHeaders("Set-Cookie").length == 0) {
-                        logger.info("no set-cookie for " + clientContext.getRequest().getRequestLine());
-                        //addZ9SessionCookie(response, clientContext);
-                        return;
-                    }
-
                     String z9sessionId = (String) context.getAttribute("zid");
                     if (StringUtils.isBlank(z9sessionId)) {
                         logger.info("no zid for " + clientContext.getRequest().getRequestLine());
                         return;
                     }
 
+                    if (response.getHeaders("Set-Cookie").length == 0) {
+                        logger.info("no set-cookie for " + clientContext.getRequest().getRequestLine());
+                        return;
+                    }
 
                     cookieSwapper.mediate(z9sessionId, response, clientContext);
 

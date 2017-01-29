@@ -26,20 +26,19 @@ class SessionHelper {
 	 * This is to keep the session active in mongoDB. All sessions in MongoDB has a lifetime of 30 min (inactivity
 	 * will cause the session to be purged by mongo). By renewing (updating the createDate), active action could
 	 * potentially be extended)
-	 * @param cookieStore
-	 * @param original
+	 * @param sessionId
 	 */
 	@Async
-	void renewSessionLease(Map<String, Session> cookieStore, Session original) {
-		if (!cookieStore?.get(original.zid) || !original) return
+	void renewSessionLease(String sessionId) {
+		if (!sessionId) return
 
 		synchronized (mutex) {
-			Session currentSession = cookieStore[original.zid]
-			if (currentSession != original) return
+			Session current = sessionRepository.findOne(sessionId)
+			if (!current) return
 
-			if (System.currentTimeMillis() - currentSession.createDate.time >= 15000) {
-				currentSession.createDate = new Date()
-				sessionRepository.save(currentSession)
+			if (System.currentTimeMillis() - current.createDate.time >= 15000) {
+				current.createDate = new Date()
+				sessionRepository.save(current)
 			}
 		}
 
