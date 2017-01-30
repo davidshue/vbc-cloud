@@ -74,12 +74,15 @@ class CookieSwapper {
             cookieSpec.parse(header, cookieOrigin).each {cookie ->
                 if (cookie.name != Z9HttpUtils.Z9_SESSION_ID) {
                     if (cookie.value && cookie.value != '""') {
-                        logger.info("adding $cookie")
+                        logger.info("adding $cookie for $z9sessionid")
                         cookieStore.get(z9sessionid, new Session(nodeId: nodeId, zid: z9sessionid)).cookies[cookie.name] = cookie.value
+                        logger.info('post set-cookies ' + cookieStore[z9sessionid].cookies)
                     }
                     else {
-                        logger.info("removing $cookie")
+                        logger.info("removing $cookie for $z9sessionid")
+                        logger.info('before post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
                         cookieStore.get(z9sessionid)?.cookies?.remove(cookie.name)
+                        logger.info('after post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
                     }
                 }
 
