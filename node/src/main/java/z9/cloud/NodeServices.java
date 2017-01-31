@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import z9.cloud.core2.Input;
 import z9.cloud.core2.Output;
 import z9.cloud.core2.Z9HttpRequest;
+import z9.cloud.core2.Z9HttpResponse;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by dshue1 on 3/13/16.
@@ -23,6 +26,7 @@ import java.io.IOException;
 @RestController
 public class NodeServices {
 	private static Log logger = LogFactory.getLog(NodeServices.class);
+	private static List<String> WRITE_METHODS = Arrays.asList("POST", "post", "PUT", "put", "DELETE", "delete", "PATCH", "patch");
 
 
 	@Autowired
@@ -44,9 +48,15 @@ public class NodeServices {
 
 	@RequestMapping(value = "/v1/http", method=RequestMethod.POST)
 	public Object httpV1(@RequestBody Z9HttpRequest input) throws IOException, HttpException {
-		input.setOrigin(env);
-		template.convertAndSend("http_exchange", "broadcast", input);
-		return processor.executeHttp(input);
+
+		Z9HttpResponse out = processor.executeHttp(input);
+
+		if (out.getStatusLine().getStatusCode() < 400 && WRITE_METHODS.contains(input.getRequestLine().getMethod())) {
+			input.setOrigin(env);
+			template.convertAndSend("http_exchange", "broadcast", input);
+		}
+
+		return out;
 	}
 
 	@RequestMapping(value= "/v1/test", method=RequestMethod.POST)
