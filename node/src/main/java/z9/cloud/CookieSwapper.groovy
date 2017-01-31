@@ -50,8 +50,9 @@ class CookieSwapper {
 		Session session = cookieStore[z9sessionid]
 		if (session?.cookies) {
 			println 'nodeCookies ' + session.cookies
-            request.removeHeaders("Cookie");
+            request.removeHeaders("Cookie")
             String value  = session.cookies.collect {k, v -> "$k=$v"}.join('; ')
+            value += "; z9sessionid=$z9sessionid"
             logger.info("cookie value: $value")
             request.addHeader(new BasicHeader('Cookie', value))
 
@@ -70,6 +71,7 @@ class CookieSwapper {
         CookieOrigin cookieOrigin = context.cookieOrigin
         CookieSpec cookieSpec = context.cookieSpec
 
+        logger.info response.getHeaders('Set-Cookie').join('-------')
         response.getHeaders('Set-Cookie').each {header ->
             cookieSpec.parse(header, cookieOrigin).each {cookie ->
                 if (cookie.name != Z9HttpUtils.Z9_SESSION_ID) {
