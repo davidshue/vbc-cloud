@@ -14,7 +14,7 @@
 		<module>server</module>
 		<module>gateway</module>
 		<module>config</module>
-		<module>core</module>
+		<module>core2</module>
 		<module>turbine</module>
 		<module>node</module>
 		<module>switch</module>
