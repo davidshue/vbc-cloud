@@ -6,7 +6,7 @@
 
 	<groupId>z9.cloud</groupId>
 	<artifactId>vbc-eureka-spring-cloud</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>VBC Cloud discovery</name>
 
@@ -14,9 +14,11 @@
 		<module>server</module>
 		<module>gateway</module>
 		<module>config</module>
+		<module>core</module>
 		<module>turbine</module>
 		<module>node</module>
 		<module>switch</module>
+		<module>security</module>
 	</modules>	
 
 </project>

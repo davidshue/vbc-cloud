@@ -5,11 +5,11 @@
 
 	<groupId>z9.cloud</groupId>
 	<artifactId>gateway</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>gateway</name>
-	<description>VBC Eureka Zuul Service Gateway</description>
+	<description>VBC Eureka Zuul Service Gateway(might not be needed)</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

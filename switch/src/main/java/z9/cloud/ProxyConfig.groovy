@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import z9.cloud.core2.HttpRetry
 import z9.cloud.z9.cloud.http.HttpDelegate
 import z9.cloud.z9.cloud.http.HttpProxyRequestHandler
 /**
@@ -40,5 +41,10 @@ class ProxyConfig {
 		ProxyExecutor proxy = new ProxyExecutor(httpHandler(), taskExecutor())
 		proxy.startExecutor()
 		proxy
+	}
+
+	@Bean
+	HttpRetry httpRetry() {
+		new HttpRetry()
 	}
 }

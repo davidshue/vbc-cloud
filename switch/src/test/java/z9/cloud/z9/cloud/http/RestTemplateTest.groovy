@@ -1,6 +1,7 @@
 package z9.cloud.z9.cloud.http
 
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -9,8 +10,9 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestTemplate
-import z9.cloud.core.Input
-import z9.cloud.core.Output
+import z9.cloud.core2.Input
+import z9.cloud.core2.Output
+
 
 /**
  * Created by dshue1 on 3/15/16.
@@ -28,6 +30,7 @@ class RestTemplateTest {
 	}
 
 	@Test
+	@Ignore
 	void testHttp() {
 		Input input = new  Input(name: 'david shue', age: 22)
 

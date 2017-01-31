@@ -1,6 +1,17 @@
 spring:
   application:
     name: node
+  rabbitmq:
+    addresses: localhost
+    username: guest
+    password: guest
+  data:
+    mongodb:
+      authentication-database: vbc
+      database: vbc
+      host: localhost
+      username: z9user
+      password: password
 hystrix:
   command:
     default:
