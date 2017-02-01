@@ -27,6 +27,7 @@ class HttpDelegate {
 		}
 		Z9HttpResponse z9Response = nodeService.httpV1(z9Request);
 		HttpResponse response = z9Response.toBasicHttpResponse();
+		logger.info("response from " + response.getFirstHeader("node"));
 		return response;
 	}
 }

@@ -94,6 +94,7 @@ class EventProcessor {
                     //if (response.getStatusLine().getStatusCode() != 200) {
                     //    return;
                     //}
+                    response.addHeader("node", nodeId);
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
                     logger.info("handling response on " + clientContext.getRequest().getRequestLine());
 
