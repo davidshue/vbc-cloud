@@ -137,13 +137,10 @@ class EventProcessor {
         HttpRequest request = input.toBasicHttpRequest();
         HttpResponse response = exchange(request);
 
-
-
         return Z9HttpResponse.toZ9HttpResponse(response);
-
     }
 
-    HttpResponse exchange(HttpRequest request) throws IOException {
+    private HttpResponse exchange(HttpRequest request) throws IOException {
         CloseableHttpResponse response = null;
 
         try {
@@ -161,9 +158,5 @@ class EventProcessor {
         } finally {
             IOUtils.closeQuietly(response);
         }
-
     }
-
-
-
 }
