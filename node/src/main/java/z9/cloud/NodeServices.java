@@ -39,6 +39,9 @@ public class NodeServices {
 	@Autowired
 	private EventProcessor processor;
 
+	@Autowired
+	private SessionHelper sessionHelper;
+
 
 	@RequestMapping(value = "/v1", method=RequestMethod.POST)
 	public String v1() {
@@ -54,6 +57,7 @@ public class NodeServices {
 		if (out.getStatusLine().getStatusCode() < 400 && WRITE_METHODS.contains(input.getRequestLine().getMethod())) {
 			input.setOrigin(env);
 			template.convertAndSend("http_exchange", "broadcast", input);
+			sessionHelper.saveRevival(input);
 		}
 
 		return out;

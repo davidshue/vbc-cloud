@@ -10,5 +10,7 @@ import java.util.List;
 public interface RevivalRepository extends MongoRepository<Revival, String> {
 	List<Revival> findByZ9SessionId(String z9SessionId);
 
+	List<Revival> findByZ9SessionIdAndUrl(String z9SessionId, String url);
+
 	Long deleteByZ9SessionId(String z9SessionId);
 }

@@ -98,6 +98,9 @@ class CookieSwapper {
         if (!cookieStore[z9sessionid]?.cookies) {
             logger.info("removing $cookieStore.z9sessionid")
             cookieStore.remove(z9sessionid)
+            // If this is for logout, z9sessionid needs to be reset
+            logger.info('addding session-reset header')
+            response.addHeader(new BasicHeader('session-reset', '1'))
         }
         else {
             logger.info cookieStore[z9sessionid]

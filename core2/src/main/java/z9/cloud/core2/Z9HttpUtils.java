@@ -83,6 +83,10 @@ public abstract class Z9HttpUtils {
         response.addHeader("Set-Cookie", Z9_SESSION_ID + "=" + id + "; path=/; HttpOnly");
     }
 
+    public static void removeZ9SessionIdFromResponse(HttpResponse response) {
+        response.addHeader("Set-Cookie", Z9_SESSION_ID + "=\"\"; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/");
+    }
+
     public static String getZid(HttpRequest request) {
         Header[] headers = request.getHeaders("zid");
         if (headers == null || headers.length == 0) {

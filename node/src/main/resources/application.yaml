@@ -23,3 +23,5 @@ http:
   server: www.zenvault.com
   port: 80
   protocol: http
+  revive:
+    urls: /j_spring_security_check, /enc

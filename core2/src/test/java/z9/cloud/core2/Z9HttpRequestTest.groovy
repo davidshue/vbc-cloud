@@ -52,11 +52,12 @@ class Z9HttpRequestTest {
     @Test
     void testMapping() {
         Z9HttpRequest request = new Z9HttpRequest(
-                headers: [new Z9Header(name: 'header1', value: 'value1'), new Z9Header(name: 'header2', value: 'value2'), new Z9Header(name: 'cookie', value: 'z9sessionid=abcd1234')],
+                headers: [new Z9Header(name: 'header1', value: 'value1'), new Z9Header(name: 'header2', value: 'value2'), new Z9Header(name: 'Cookie', value: 'z9sessionid=abcd1234')],
                 requestLine: new Z9RequestLine(method: 'post', uri: '/www.cnn.com', protocolVersion: new Z9ProtocolVersion(protocol: 'https', major: 1, minor: 1))
         )
 
         println request
+        assertEquals 'abcd1234', request.z9SessionId
         def json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(request)
 
         println json

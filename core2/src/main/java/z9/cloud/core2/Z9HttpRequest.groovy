@@ -1,8 +1,12 @@
 package z9.cloud.core2
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import org.apache.http.Header
+import org.apache.http.HeaderElement
 import org.apache.http.HttpRequest
+import org.apache.http.NameValuePair
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.message.BasicHeader
 import org.apache.http.message.BasicHttpEntityEnclosingRequest
@@ -25,6 +29,23 @@ class Z9HttpRequest implements Serializable {
 
     byte[] content = null
 
+    @JsonIgnore
+    String getZ9SessionId() {
+        Header[] cookies = headers.findAll {it.name == 'Cookie'}.collect{it.toBasicHeader()}
+
+        for (Header cookie : cookies) {
+            for (HeaderElement headerElement : cookie.getElements()) {
+                if (headerElement.name == Z9HttpUtils.Z9_SESSION_ID) {
+                    return headerElement.value
+                }
+                NameValuePair nvp = headerElement.getParameterByName(Z9HttpUtils.Z9_SESSION_ID)
+                if (nvp) {
+                    return nvp.value
+                }
+            }
+        }
+        return null
+    }
 
 
     BasicHttpRequest toBasicHttpRequest() {
