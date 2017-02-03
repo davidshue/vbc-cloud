@@ -63,7 +63,7 @@ class SessionHelper {
 
 	Revival findRevivalByZ9SessionIdAndUrl(String z9SessionId, String url) {
 		List<Revival> revivals = revivalRepository.findByZ9SessionIdAndUrl(z9SessionId, url)
-		return revivals ? reviveUrls[0] : null
+		return revivals ? revivals[0] : null
 	}
 
 	@Async
