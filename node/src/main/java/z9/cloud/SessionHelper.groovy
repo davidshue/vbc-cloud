@@ -62,8 +62,8 @@ class SessionHelper {
 	}
 
 	List<Revival> revive(String z9SessionId) {
-		List<Revival> revivals = revivalRepository.findByZ9SessionId()
-				.findAll{it.timestamp < System.currentTimeMillis() - EventProcessor.THIRTY_MIN}
+		List<Revival> revivals = revivalRepository.findByZ9SessionId(z9SessionId)
+				.findAll{it.timestamp.time < System.currentTimeMillis() - EventProcessor.THIRTY_MIN}
 				.sort{a, b -> a.order <=> b.order}
 				.each {
 					it.timestamp = new Date()

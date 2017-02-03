@@ -34,7 +34,7 @@ import java.util.List;
 class EventProcessor {
     private final Log logger = LogFactory.getLog(getClass());
 
-    public static final Long THIRTY_MIN = 30*60_1000L;
+    public static final Long THIRTY_MIN = 30*60_000L;
 
     @Value("${http.waittime}")
     private long waitTime;
