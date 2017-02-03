@@ -18,6 +18,9 @@ class SessionHelper {
 	@Autowired
 	private RevivalRepository revivalRepository
 
+	@Autowired
+	private EventProcessor eventProcessor
+
 	@Value('${http.revive.urls}')
 	private String revive
 
@@ -61,6 +64,14 @@ class SessionHelper {
 
 	}
 
+	void revive(String z9SessionId) {
+		List<Revival> revivals = revivalRepository.findByZ9SessionId().findAll{it.timestamp < System.currentTimeMillis() - EventProcessor.THIRTY_MIN}.sort{a, b -> a.order <=> b.order}
+		revivals.each {
+			it.timestamp = new Date()
+			revivalRepository.save(it)
+		}
+	}
+
 	Revival findRevivalByZ9SessionIdAndUrl(String z9SessionId, String url) {
 		List<Revival> revivals = revivalRepository.findByZ9SessionIdAndUrl(z9SessionId, url)
 		return revivals ? revivals[0] : null
@@ -81,6 +92,7 @@ class SessionHelper {
 			revival = new Revival(z9SessionId: z9SessionId, url: urlOrder.url, order: urlOrder.order)
 		}
 		revival.request = request
+		revival.timestamp = new Date()
 		revivalRepository.save(revival)
 	}
 

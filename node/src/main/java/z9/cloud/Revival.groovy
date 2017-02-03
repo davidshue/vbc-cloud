@@ -24,6 +24,8 @@ class Revival {
 
 	int order = 0
 
+	Date timestamp = new Date()
+
 	Z9HttpRequest request
 
 	String getId() {

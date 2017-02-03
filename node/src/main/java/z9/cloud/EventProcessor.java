@@ -20,7 +20,6 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import z9.cloud.core2.HttpRetry;
 import z9.cloud.core2.Z9HttpRequest;
@@ -34,11 +33,7 @@ import java.io.IOException;
 class EventProcessor {
     private final Log logger = LogFactory.getLog(getClass());
 
-    private static final String LINE_RETURN = "\r\n";
-    private static final String HTTP_ELEMENT_CHARSET = "US-ASCII";
-
-    @Autowired
-    private Environment environment;
+    public static final Long THIRTY_MIN = 30*60_1000L;
 
     @Value("${http.waittime}")
     private long waitTime;
@@ -61,6 +56,9 @@ class EventProcessor {
 
     @Autowired
     private HttpRetry httpRetry;
+
+    @Autowired
+    private SessionHelper sessionHelper;
 
 
     private HttpHost httpHost;
@@ -130,6 +128,14 @@ class EventProcessor {
         if (StringUtils.equals(input.getOrigin(), nodeId)) {
             return;
         }
+
+        if ((System.currentTimeMillis() - input.getTimestamp()) >= THIRTY_MIN) {
+            String z9SessionId = input.getZ9SessionId();
+            if (z9SessionId != null) {
+                sessionHelper.revive(z9SessionId);
+            }
+        }
+
         executeHttp(input);
     }
 

@@ -15,7 +15,7 @@ import org.apache.http.util.EntityUtils
 /**
  * Created by david on 1/10/17.
  */
-@EqualsAndHashCode(excludes = ['origin', 'newZid'])
+@EqualsAndHashCode(excludes = ['origin', 'newZid', 'timestamp'])
 @ToString(includeNames = true, includePackage = false, ignoreNulls = true)
 class Z9HttpRequest implements Serializable {
     private static final long serialVersionUID = 1L
@@ -28,6 +28,8 @@ class Z9HttpRequest implements Serializable {
     String newZid
 
     byte[] content = null
+
+    Long timestamp = System.currentTimeMillis()
 
     @JsonIgnore
     String getZ9SessionId() {
