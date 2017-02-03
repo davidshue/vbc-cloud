@@ -54,10 +54,12 @@ public class NodeServices {
 
 		Z9HttpResponse out = processor.executeHttp(input);
 
-		if (out.getStatusLine().getStatusCode() < 400 && WRITE_METHODS.contains(input.getRequestLine().getMethod())) {
+		if (out.getStatusLine().getStatusCode() < 400) {
 			input.setOrigin(env);
 			template.convertAndSend("http_exchange", "broadcast", input);
-			sessionHelper.saveRevival(input);
+			if (WRITE_METHODS.contains(input.getRequestLine().getMethod())) {
+				sessionHelper.saveRevival(input);
+			}
 		}
 
 		return out;

@@ -28,6 +28,7 @@ import z9.cloud.core2.Z9HttpUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 class EventProcessor {
@@ -132,7 +133,15 @@ class EventProcessor {
         if ((System.currentTimeMillis() - input.getTimestamp()) >= THIRTY_MIN) {
             String z9SessionId = input.getZ9SessionId();
             if (z9SessionId != null) {
-                sessionHelper.revive(z9SessionId);
+                List<Revival> revivals = sessionHelper.revive(z9SessionId);
+                revivals.forEach((Revival revival) -> {
+                            try {
+                                executeHttp(revival.getRequest());
+                            } catch (IOException | HttpException e) {
+                                logger.error(e.getMessage(), e);
+                            }
+                        }
+                );
             }
         }
 
