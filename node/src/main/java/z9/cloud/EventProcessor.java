@@ -36,6 +36,8 @@ class EventProcessor {
 
     public static final Long THIRTY_MIN = 30*60_000L;
 
+    public static final Long ONE_HOUR = 60 * 60_000L;
+
     @Value("${http.waittime}")
     private long waitTime;
 
@@ -133,7 +135,7 @@ class EventProcessor {
         if ((System.currentTimeMillis() - input.getTimestamp()) >= THIRTY_MIN) {
             String z9SessionId = input.getZ9SessionId();
             if (z9SessionId != null) {
-                List<Revival> revivals = sessionHelper.revive(z9SessionId);
+                List<Revival> revivals = sessionHelper.revive(nodeId, z9SessionId);
                 revivals.forEach((Revival revival) -> {
                             try {
                                 executeHttp(revival.getRequest());

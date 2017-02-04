@@ -61,12 +61,12 @@ class SessionHelper {
 
 	}
 
-	List<Revival> revive(String z9SessionId) {
+	List<Revival> revive(String nodeId, String z9SessionId) {
 		List<Revival> revivals = revivalRepository.findByZ9SessionId(z9SessionId)
-				.findAll{it.timestamp.time < System.currentTimeMillis() - EventProcessor.THIRTY_MIN}
+				.findAll{it.nodeTimestamps.get(nodeId, System.currentTimeMillis() - EventProcessor.ONE_HOUR) < System.currentTimeMillis() - EventProcessor.THIRTY_MIN}
 				.sort{a, b -> a.order <=> b.order}
 				.each {
-					it.timestamp = new Date()
+					it.nodeTimestamps[nodeId] = System.currentTimeMillis()
 					revivalRepository.save(it)
 				}
 		return revivals
@@ -92,7 +92,6 @@ class SessionHelper {
 			revival = new Revival(z9SessionId: z9SessionId, url: urlOrder.url, order: urlOrder.order)
 		}
 		revival.request = request
-		revival.timestamp = new Date()
 		revivalRepository.save(revival)
 	}
 
