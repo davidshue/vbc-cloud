@@ -87,6 +87,7 @@ class CookieSwapper {
                         logger.info('before post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
                         cookieStore.get(z9sessionid)?.cookies?.remove(cookie.name)
                         logger.info('after post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
+                        context.setAttribute("unsetZid", Boolean.TRUE)
                     }
                 }
 
@@ -101,8 +102,6 @@ class CookieSwapper {
             logger.info("removing $cookieStore.z9sessionid")
             cookieStore.remove(z9sessionid)
             // If this is for logout, z9sessionid needs to be reset
-            logger.info('addding session-reset header')
-            response.addHeader(new BasicHeader('session-reset', '1'))
         }
         else {
             logger.info cookieStore[z9sessionid]
