@@ -28,14 +28,19 @@ class SessionHelper {
 		reviveUrls = revive.split(/[,; ]+/)
 	}
 
-	private Object mutex = new Object()
+	private Object mutex1 = new Object()
+	private Object mutex2 = new Object()
+	private Object mutex3 = new Object()
 
 	@Async
 	void handleSessionsByNodeIdAndZid(Session session) {
 		if (!session) return
-		sessionRepository.deleteByNodeIdAndZid(session.nodeId, session.zid)
+
 		if (session.cookies) {
-			sessionRepository.save(session)
+			synchronized (mutex1) {
+				sessionRepository.deleteByNodeIdAndZid(session.nodeId, session.zid)
+				sessionRepository.save(session)
+			}
 		}
 	}
 
@@ -49,7 +54,7 @@ class SessionHelper {
 	void renewSessionLease(String sessionId) {
 		if (!sessionId) return
 
-		synchronized (mutex) {
+		synchronized (mutex2) {
 			Session current = sessionRepository.findOne(sessionId)
 			if (!current) return
 
@@ -87,12 +92,15 @@ class SessionHelper {
 		if (!urlOrder) {
 			return
 		}
-		Revival revival = findRevivalByZ9SessionIdAndUrl(z9SessionId, urlOrder.url)
-		if (!revival) {
-			revival = new Revival(z9SessionId: z9SessionId, url: urlOrder.url, order: urlOrder.order)
+		synchronized (mutex3) {
+			Revival revival = findRevivalByZ9SessionIdAndUrl(z9SessionId, urlOrder.url)
+			if (!revival) {
+				revival = new Revival(z9SessionId: z9SessionId, url: urlOrder.url, order: urlOrder.order)
+			}
+			revival.request = request
+			revivalRepository.save(revival)
 		}
-		revival.request = request
-		revivalRepository.save(revival)
+
 	}
 
 	private UrlOrder getRevivalUrl(String uri) {
