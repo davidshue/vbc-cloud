@@ -66,7 +66,9 @@ class CookieSwapper {
 	}
 
 	void mediate(String z9sessionid, HttpResponse response, HttpClientContext context) {
-		if (!z9sessionid || !response.getHeaders('Set-Cookie')) return
+		if (!z9sessionid || !response.getHeaders('Set-Cookie')) {
+            return
+        }
 
         CookieOrigin cookieOrigin = context.cookieOrigin
         CookieSpec cookieSpec = context.cookieSpec
@@ -105,6 +107,6 @@ class CookieSwapper {
         else {
             logger.info cookieStore[z9sessionid]
         }
-	}
 
+	}
 }

@@ -90,14 +90,13 @@ class EventProcessor {
                         cookieSwapper.swap(request, zsessionId);
                     }
                 })
-                .addInterceptorLast((HttpResponse response, HttpContext context) -> {
+                .addInterceptorFirst((HttpResponse response, HttpContext context) -> {
                     // nothing to mediate if the status code is not 200
                     //if (response.getStatusLine().getStatusCode() != 200) {
                     //    return;
                     //}
-                    response.addHeader("node", nodeId);
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
-                    logger.info("handling response on " + clientContext.getRequest().getRequestLine());
+                    logger.info("firsthand handling response on " + clientContext.getRequest().getRequestLine());
 
                     String z9sessionId = (String) context.getAttribute("zid");
                     if (StringUtils.isBlank(z9sessionId)) {
@@ -107,23 +106,40 @@ class EventProcessor {
 
                     if (response.getHeaders("Set-Cookie").length == 0) {
                         logger.info("no set-cookie for " + clientContext.getRequest().getRequestLine());
-                        addZ9SessionCookie(response, clientContext);
                         return;
                     }
 
                     cookieSwapper.mediate(z9sessionId, response, clientContext);
+                })
+                .addInterceptorLast((HttpResponse response, HttpContext context) -> {
+                    HttpClientContext clientContext = HttpClientContext.adapt(context);
+                    logger.info("secondhand handling response on " + clientContext.getRequest().getRequestLine());
 
+                    response.addHeader("node", nodeId);
+                    String z9sessionId = (String) context.getAttribute("zid");
+
+                    if (StringUtils.isBlank(z9sessionId)) {
+                        logger.info("no zid for " + clientContext.getRequest().getRequestLine());
+                        return;
+                    }
                     addZ9SessionCookie(response, clientContext);
-                }).build();
+                })
+                .build();
     }
 
     private void addZ9SessionCookie(HttpResponse response, HttpClientContext context) {
+        boolean unsetZid = context.getAttribute("unsetZid") != null? true: false;
+        if (unsetZid) {
+            Z9HttpUtils.removeZ9SessionIdFromResponse(response);
+            return;
+        }
         String z9sessionId = (String) context.getAttribute("zid");
         boolean setZid = (boolean) context.getAttribute("setZid");
         if (setZid && !Z9HttpUtils.isZ9SessionIdSet(response, context)) {
             Z9HttpUtils.addZ9SessionIdToResponse(response, z9sessionId);
         }
     }
+
 
 
     public void processHttp(Z9HttpRequest input) throws IOException, HttpException {
