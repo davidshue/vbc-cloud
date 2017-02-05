@@ -1,7 +1,9 @@
 package z9.cloud.z9.cloud.http;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -27,6 +29,17 @@ class HttpDelegate {
 		}
 		Z9HttpResponse z9Response = nodeService.httpV1(z9Request);
 		HttpResponse response = z9Response.toBasicHttpResponse();
+
+		Header zsessionHeader = response.getFirstHeader("zsession-reset");
+		if(zsessionHeader != null) {
+			String id = zsessionHeader.getValue();
+			if (StringUtils.isBlank(id)) {
+				Z9HttpUtils.removeZ9SessionIdFromResponse(response);
+			}
+			else {
+				Z9HttpUtils.addZ9SessionIdToResponse(response, id);
+			}
+		}
 		logger.info("response from " + response.getFirstHeader("node"));
 		return response;
 	}

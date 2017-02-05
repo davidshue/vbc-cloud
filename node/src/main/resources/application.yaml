@@ -25,3 +25,4 @@ http:
   protocol: http
   revive:
     urls: /j_spring_security_check, /enc
+    logout: /j_spring_security_logout

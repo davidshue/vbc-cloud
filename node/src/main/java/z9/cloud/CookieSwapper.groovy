@@ -35,7 +35,6 @@ class CookieSwapper {
 
 	private Map<String, Session> cookieStore = [:]
 
-
 	@PostConstruct
 	void afterConstruct() {
 		nodeId = 'node-' + env
@@ -87,7 +86,6 @@ class CookieSwapper {
                         logger.info('before post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
                         cookieStore.get(z9sessionid)?.cookies?.remove(cookie.name)
                         logger.info('after post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
-                        context.setAttribute("unsetZid", Boolean.TRUE)
                     }
                 }
 
@@ -101,7 +99,6 @@ class CookieSwapper {
         if (!cookieStore[z9sessionid]?.cookies) {
             logger.info("removing $cookieStore.z9sessionid")
             cookieStore.remove(z9sessionid)
-            // If this is for logout, z9sessionid needs to be reset
         }
         else {
             logger.info cookieStore[z9sessionid]

@@ -14,6 +14,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -49,6 +50,9 @@ class EventProcessor {
 
     @Value("${http.protocol}")
     private String protocol;
+
+    @Value("${http.revive.logout}")
+    private String logoutUrl;
 
     @Autowired
     @Qualifier("env")
@@ -128,15 +132,14 @@ class EventProcessor {
     }
 
     private void addZ9SessionCookie(HttpResponse response, HttpClientContext context) {
-        boolean unsetZid = context.getAttribute("unsetZid") != null? true: false;
-        if (unsetZid) {
-            Z9HttpUtils.removeZ9SessionIdFromResponse(response);
-            return;
+        if (context.getRequest().getRequestLine().getUri().startsWith(logoutUrl)) {
+            response.addHeader(new BasicHeader("zsession-reset", ""));
         }
+
         String z9sessionId = (String) context.getAttribute("zid");
         boolean setZid = (boolean) context.getAttribute("setZid");
         if (setZid && !Z9HttpUtils.isZ9SessionIdSet(response, context)) {
-            Z9HttpUtils.addZ9SessionIdToResponse(response, z9sessionId);
+            response.addHeader(new BasicHeader("zsession-reset", z9sessionId));
         }
     }
 
