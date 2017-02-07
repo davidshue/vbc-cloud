@@ -3,16 +3,18 @@ package z9.cloud
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.FanoutExchange
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
-import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class RabbitTestAppConfig {
 	@Bean
-	ConnectionFactory connectionFactory() {
-		new CachingConnectionFactory()
+	connectionFactory(@Value('${spring.rabbitmq.addresses}') String addresses,
+					  @Value('${spring.rabbitmq.username}') String username,
+					  @Value('${spring.rabbitmq.password}') String password) {
+		new CachingConnectionFactory(addresses: addresses, username:username, password:password)
 	}
 	
 	@Bean

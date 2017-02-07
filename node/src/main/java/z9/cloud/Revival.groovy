@@ -10,7 +10,7 @@ import z9.cloud.core2.Z9HttpRequest
  * Created by dshue1 on 6/19/16.
  */
 @ToString(includeNames = true, includePackage = false, ignoreNulls = true)
-@TupleConstructor(excludes = ['id', 'order'])
+@TupleConstructor(excludes = ['id', 'order', 'nodeTimestamps'])
 @EqualsAndHashCode(includes = ['z9SessionId', 'url'])
 @Document(collection = 'revival')
 class Revival {
