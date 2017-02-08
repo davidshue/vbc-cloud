@@ -2,20 +2,19 @@ package z9.cloud
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import org.springframework.test.context.junit4.SpringRunner
 import z9.cloud.core2.Z9Header
 import z9.cloud.core2.Z9HttpRequest
 import z9.cloud.core2.Z9ProtocolVersion
 import z9.cloud.core2.Z9RequestLine
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @ContextConfiguration(classes=RabbitTestAppConfig.class)
 @ActiveProfiles('rabbit')
 class RabbitTest {
