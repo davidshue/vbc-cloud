@@ -26,7 +26,8 @@
 		<module>node</module>
 		<module>switch</module>
 		<module>security</module>
-		<module>kafka</module>
+		<module>kafka-node</module>
+		<module>kafka-switch</module>
 	</modules>
 
 	<properties>

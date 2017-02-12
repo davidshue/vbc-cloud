@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: kafka-switch
+threadpool:
+  queue:
+    size:
+      core: 50
+      max: 100
+      capacity: 2000
+hystrix:
+  command:
+    default:
+      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 60000
+        timeout:
+          enabled: false
+#node:
+#  ribbon:
+#    ConnectTimeout: 30000
+#    ReadTimeout: 600000

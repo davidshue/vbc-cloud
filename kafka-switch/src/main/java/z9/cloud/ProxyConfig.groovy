@@ -3,6 +3,7 @@ package z9.cloud
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import z9.cloud.core2.HttpRetry
 import z9.cloud.http.HttpDelegate
@@ -16,6 +17,11 @@ class ProxyConfig {
 	@Value('${threadpool.queue.size.core}') private int coreSize
 	@Value('${threadpool.queue.size.max}') private int maxSize
 	@Value('${threadpool.queue.size.capacity}') private int capacity
+
+	@Bean
+	String env(Environment env) {
+		env.activeProfiles.length == 0 ? 'default' : env.activeProfiles[0]
+	}
 
 	@Bean
 	taskExecutor() {

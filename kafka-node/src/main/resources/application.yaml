@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: kafka-node
+  data:
+      mongodb:
+        authentication-database: vbc
+        database: vbc
+        host: localhost
+        username: z9user
+        password: password
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: false
+http:
+  waittime: 200
+  server: www.zenvault.com
+  port: 80
+  protocol: http
+  revive:
+    urls: /j_spring_security_check, /enc
+    logout: /j_spring_security_logout
