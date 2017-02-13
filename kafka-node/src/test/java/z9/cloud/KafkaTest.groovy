@@ -25,7 +25,7 @@ class KafkaTest {
     private Listener listener
 
     @Autowired
-    private KafkaTemplate<Integer, String> template
+    private KafkaTemplate<Integer, Object> template
 
     @Test
     void testSimple() throws Exception {

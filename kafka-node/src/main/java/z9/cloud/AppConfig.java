@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -28,9 +29,12 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class AppConfig {
+    @Autowired
+    private Environment environment;
+
     @Bean
-    public String env(Environment env) {
-        return env.getActiveProfiles().length == 0 ? "default" : env.getActiveProfiles()[0];
+    public String env() {
+        return environment.getActiveProfiles().length == 0 ? "default" : environment.getActiveProfiles()[0];
     }
 
     @Bean
@@ -55,7 +59,7 @@ public class AppConfig {
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-consumer-group2");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-consumer-group2-" + env());
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100");
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000");
