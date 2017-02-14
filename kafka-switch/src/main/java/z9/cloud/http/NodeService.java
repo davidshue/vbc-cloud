@@ -12,7 +12,7 @@ import z9.cloud.core2.Z9HttpResponse;
 /**
  * Created by dshue1 on 3/18/16.
  */
-@FeignClient(value="kafka-node", fallback = NodeServiceFallback.class)
+@FeignClient(name="kafka-node", fallback = NodeServiceFallback.class)
 public interface NodeService {
 	@RequestMapping(value = "/v1", method=RequestMethod.POST)
 	String v1();

@@ -8,6 +8,14 @@ spring:
         host: localhost
         username: z9user
         password: password
+kafka:
+  zookeeper: localhost:9092
+  group:
+    prefix: vbc-nodes
+  autocommit:
+    interval: 100
+  session:
+    timeout: 15000
 hystrix:
   command:
     default:

@@ -11,11 +11,12 @@ hystrix:
   command:
     default:
       execution:
-#        isolation:
-#          thread:
-#            timeoutInMilliseconds: 60000
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 1000
         timeout:
-          enabled: false
+          enabled: true
 #node:
 #  ribbon:
 #    ConnectTimeout: 30000
