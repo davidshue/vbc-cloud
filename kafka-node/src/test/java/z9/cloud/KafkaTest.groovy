@@ -34,8 +34,8 @@ class KafkaTest {
                 requestLine: new Z9RequestLine(method: 'post', uri: 'http://www.cnn.com', protocolVersion: new Z9ProtocolVersion(protocol: 'https', major: 1, minor: 1)),
                 content: 'this is a test'.bytes
         )
-        template.send("annotated1", 0, request)
+        template.send("node-test", 0, request)
         template.flush()
-        assertTrue(this.listener.getLatch1().await(10, TimeUnit.SECONDS))
+        assertTrue(this.listener.getLatch().await(10, TimeUnit.SECONDS))
     }
 }

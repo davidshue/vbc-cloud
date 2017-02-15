@@ -8,15 +8,15 @@ import java.util.concurrent.CountDownLatch;
  * Created by david on 2/8/17.
  */
 public class Listener {
-    private final CountDownLatch latch1 = new CountDownLatch(1);
+    private final CountDownLatch latch = new CountDownLatch(1);
 
-    public CountDownLatch getLatch1() {
-        return latch1;
+    public CountDownLatch getLatch() {
+        return latch;
     }
 
-    @KafkaListener(id = "foo", topics = "annotated1")
+    @KafkaListener(id = "foo", topics = "node-test")
     public void listen1(String foo) {
         System.out.println(foo);
-        this.latch1.countDown();
+        this.latch.countDown();
     }
 }
