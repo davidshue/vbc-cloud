@@ -13,9 +13,9 @@ import z9.cloud.http.HttpProxyRequestHandler
 
 @Configuration
 class ProxyConfig {
-	@Value('${threadpool.queue.size.core}') private int coreSize
-	@Value('${threadpool.queue.size.max}') private int maxSize
-	@Value('${threadpool.queue.size.capacity}') private int capacity
+	@Value('${threadpool.queue.size.core:50}') private int coreSize
+	@Value('${threadpool.queue.size.max:100}') private int maxSize
+	@Value('${threadpool.queue.size.capacity:2000}') private int capacity
 
 	@Bean
 	taskExecutor() {

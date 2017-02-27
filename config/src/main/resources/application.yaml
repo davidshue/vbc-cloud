@@ -24,6 +24,7 @@ spring:
         git:
 #          uri: file://${user.home}/config-repo
           uri: https://github.com/davidshue/config-repo
+          force-pull: true
           basedir: target/config
 security:
   basic:
@@ -34,3 +35,9 @@ security:
     name: admin
     password: s3cret
     role: USER
+encrypt:
+  keyStore:
+    location: classpath:/server.jks
+    password: letmein
+    alias: mytestkey
+    secret: changeme
