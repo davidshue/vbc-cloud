@@ -71,6 +71,43 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.4.13</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<imageName>davidshue/vbc-${project.artifactId}</imageName>
+					<baseImage>java:8</baseImage>
+					<cmd>["/opt/run.sh"]</cmd>
+					<pushImage>false</pushImage>
+					<maintainer>
+						David Shue (davidcshue@gmail.com)
+					</maintainer>
+					<resources>
+						<resource>
+							<targetPath>/opt</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+						<resource>
+							<targetPath>/opt</targetPath>
+							<directory>.</directory>
+							<include>run.sh</include>
+						</resource>
+					</resources>
+					<serverId>docker-hub</serverId>
+					<registryUrl>https://index.docker.io/v1</registryUrl>
+
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
