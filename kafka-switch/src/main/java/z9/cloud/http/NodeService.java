@@ -12,15 +12,15 @@ import z9.cloud.core2.Z9HttpResponse;
 /**
  * Created by dshue1 on 3/18/16.
  */
-@FeignClient(name="kafka-node", fallback = NodeServiceFallback.class)
+@FeignClient(name="gateway", fallback = NodeServiceFallback.class)
 public interface NodeService {
-	@RequestMapping(value = "/v1", method=RequestMethod.POST)
+	@RequestMapping(value = "/node/v1", method=RequestMethod.POST)
 	String v1();
 
-	@RequestMapping(value= "/v1/test", method=RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value= "/node/v1/test", method=RequestMethod.POST, consumes = "application/json")
 	Output testV1(Input input);
 
-	@RequestMapping(value = "/v1/http", method=RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/node/v1/http", method=RequestMethod.POST, consumes = "application/json")
 	Z9HttpResponse httpV1(Z9HttpRequest input);
 }
 

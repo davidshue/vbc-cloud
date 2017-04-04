@@ -1,3 +1,7 @@
 spring:
   application:
     name: kafka-node
+eureka:
+  instance:
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 15

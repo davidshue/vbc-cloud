@@ -1,4 +1,14 @@
 spring:
   cloud:
     config:
+      failFast: true
       uri: ${SPRING_CONFIG_URI:http://localhost:8888}
+      username: admin
+      password: s3cret
+logging:
+  level:
+    com:
+      netflix:
+        zuul:
+          http:
+            HttpServletRequestWrapper: ERROR

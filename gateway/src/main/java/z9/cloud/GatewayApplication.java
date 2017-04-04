@@ -21,13 +21,9 @@ public class GatewayApplication {
     @PostConstruct
     public void init() {
         client.getServices().forEach(
-            service -> {
-                client.getInstances(service).forEach(
-                    inst -> {
-                        System.out.println(service + ": " + inst.getUri());
-                    }
-                );
-            }
+            service -> client.getInstances(service).forEach(
+                inst -> System.out.println(service + ": " + inst.getUri())
+            )
         );
     }
 }
