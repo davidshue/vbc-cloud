@@ -17,7 +17,7 @@ class Z9HttpResponse implements Serializable {
 
     Z9StatusLine statusLine = null
 
-    Z9Header[] headers = []
+    List<Z9Header> headers = []
 
     byte[] content = []
 

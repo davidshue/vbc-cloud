@@ -22,7 +22,7 @@ class Z9HttpRequest implements Serializable {
 
     Z9RequestLine requestLine = null
 
-    Z9Header[] headers = []
+    List<Z9Header> headers = []
 
     String origin
     String newZid

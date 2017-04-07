@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,13 +26,13 @@ public class KafkaSwitchApplication {
         SpringApplication.run(KafkaSwitchApplication.class, args);
     }
 
-    @RequestMapping(value = "/v1", method= RequestMethod.GET)
-    public String v1() {
+    @RequestMapping(value = "/v1", method= RequestMethod.POST)
+    public ResponseEntity<String> v1() {
         return nodeService.v1();
     }
 
     @RequestMapping(value= "/v1/test", method=RequestMethod.POST)
-    public Output testV1(@RequestBody Input input) {
+    public ResponseEntity<Output> testV1(@RequestBody Input input) {
         return nodeService.testV1(input);
     }
 }

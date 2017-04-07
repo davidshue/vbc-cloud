@@ -56,6 +56,7 @@ class EventProcessor {
     @Value("${http.revive.logout}")
     private String logoutUrl;
 
+    //@Value("${eureka.instance.hostname}:${server.port}")
     @Autowired
     @Qualifier("env")
     private String nodeId = "node1";
@@ -123,6 +124,7 @@ class EventProcessor {
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
                     logger.info("secondhand handling response on " + clientContext.getRequest().getRequestLine());
 
+                    response.removeHeaders("node");
                     response.addHeader("node", nodeId);
                     String z9sessionId = (String) context.getAttribute("zid");
 
@@ -137,12 +139,14 @@ class EventProcessor {
 
     private void addZ9SessionCookie(HttpResponse response, HttpClientContext context) {
         if (context.getRequest().getRequestLine().getUri().startsWith(logoutUrl)) {
+            response.removeHeaders("zsession-reset");
             response.addHeader(new BasicHeader("zsession-reset", ""));
         }
 
         String z9sessionId = (String) context.getAttribute("zid");
         boolean setZid = (boolean) context.getAttribute("setZid");
         if (setZid && !Z9HttpUtils.isZ9SessionIdSet(response, context)) {
+            response.removeHeaders("zsession-reset");
             response.addHeader(new BasicHeader("zsession-reset", z9sessionId));
         }
     }

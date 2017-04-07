@@ -8,11 +8,20 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import z9.cloud.core2.Z9Header;
 import z9.cloud.core2.Z9HttpRequest;
 import z9.cloud.core2.Z9HttpResponse;
 import z9.cloud.core2.Z9HttpUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by dshue1 on 3/14/16.
@@ -22,12 +31,39 @@ class HttpDelegate {
 	@Autowired
 	private NodeService nodeService;
 
+	private RestTemplate restTemplate;
+
+	@PostConstruct
+	public void after() {
+		restTemplate = new RestTemplate();
+	}
+
 	public HttpResponse handle(HttpRequest request) throws IOException, HttpException {
 		Z9HttpRequest z9Request = Z9HttpRequest.toZ9HttpRequest(request);
 		if (Z9HttpUtils.getZ9SessionId(request) == null) {
 			z9Request.setNewZid(Z9HttpUtils.randomZ9SessionId());
 		}
-		Z9HttpResponse z9Response = nodeService.httpV1(z9Request);
+		final HttpHeaders httpHeaders = new HttpHeaders();
+		Arrays.stream(request.getHeaders("Cookie")).forEach(header ->
+			httpHeaders.add(header.getName(), header.getValue())
+		);
+		HttpEntity<Z9HttpRequest> he = new HttpEntity<>(z9Request, httpHeaders);
+
+		ResponseEntity<Z9HttpResponse> re = restTemplate.exchange(
+				"http://localhost:8005/node/v1/http",
+				HttpMethod.POST, he, Z9HttpResponse.class);
+
+		Z9HttpResponse z9Response = re.getBody();
+		List<String> setCookies = re.getHeaders().get("Set-Cookie");
+		if (setCookies != null && setCookies.size() > 0) {
+			setCookies.forEach(it -> {
+				Z9Header zh = new Z9Header();
+				zh.setName("Set-Cookie");
+				zh.setValue(it);
+				z9Response.getHeaders().add(zh);
+			});
+		}
+
 		HttpResponse response = z9Response.toBasicHttpResponse();
 
 		Header zsessionHeader = response.getFirstHeader("zsession-reset");

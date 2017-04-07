@@ -2,6 +2,7 @@ package z9.cloud.http;
 
 
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import z9.cloud.core2.Input;
@@ -15,13 +16,13 @@ import z9.cloud.core2.Z9HttpResponse;
 @FeignClient(name="gateway", fallback = NodeServiceFallback.class)
 public interface NodeService {
 	@RequestMapping(value = "/node/v1", method=RequestMethod.POST)
-	String v1();
+	ResponseEntity<String> v1();
 
 	@RequestMapping(value= "/node/v1/test", method=RequestMethod.POST, consumes = "application/json")
-	Output testV1(Input input);
+	ResponseEntity<Output> testV1(Input input);
 
 	@RequestMapping(value = "/node/v1/http", method=RequestMethod.POST, consumes = "application/json")
-	Z9HttpResponse httpV1(Z9HttpRequest input);
+	ResponseEntity<Z9HttpResponse> httpV1(Z9HttpRequest input);
 }
 
 
