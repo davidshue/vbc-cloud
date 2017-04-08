@@ -12,8 +12,10 @@ hystrix:
         timeout:
           enabled: false
 zuul:
+  ignoredServices: '*'
   routes:
     kafka-node: /node/**
+    configserver: /config/**
 eureka:
   instance:
     lease-renewal-interval-in-seconds: 10
