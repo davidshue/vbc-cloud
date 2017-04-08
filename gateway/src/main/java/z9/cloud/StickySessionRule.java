@@ -20,14 +20,13 @@ public class StickySessionRule extends ClientConfigEnabledRoundRobinRule {
 
     @Override
     public Server choose(Object key) {
-        System.out.println("inside sticky session");
         Optional<Cookie> cookie = getCookie();
 
         if (cookie.isPresent()) {
             Cookie hash = cookie.get();
             List<Server> servers = getLoadBalancer().getReachableServers();
             Optional<Server> serverFound = servers.stream()
-                    .filter(s -> hash.getValue().equals("" + s.hashCode()))
+                    .filter(s -> hash.getValue().equals("" + s.hashCode()) && s.isAlive() && s.isReadyToServe())
                     .findFirst();
 
             if (serverFound.isPresent()) {
