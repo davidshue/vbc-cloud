@@ -52,7 +52,7 @@ class CookieSwapper {
             request.removeHeaders("Cookie")
             String value  = session.cookies.collect {k, v -> "$k=$v"}.join('; ')
             value += "; z9sessionid=$z9sessionid"
-            logger.info("cookie value: $value")
+            logger.debug("cookie value: $value")
             request.addHeader(new BasicHeader('Cookie', value))
 
 			sessionHelper.renewSessionLease(session.id)
@@ -72,20 +72,20 @@ class CookieSwapper {
         CookieOrigin cookieOrigin = context.cookieOrigin
         CookieSpec cookieSpec = context.cookieSpec
 
-        logger.info response.getHeaders('Set-Cookie').join('-------')
+        logger.debug response.getHeaders('Set-Cookie').join('-------')
         response.getHeaders('Set-Cookie').each {header ->
             cookieSpec.parse(header, cookieOrigin).each {cookie ->
                 if (cookie.name != Z9HttpUtils.Z9_SESSION_ID) {
                     if (cookie.value && cookie.value != '""') {
-                        logger.info("adding $cookie for $z9sessionid")
+                        logger.debug("adding $cookie for $z9sessionid")
                         cookieStore.get(z9sessionid, new Session(nodeId: nodeId, zid: z9sessionid)).cookies[cookie.name] = cookie.value
-                        logger.info('post set-cookies ' + cookieStore[z9sessionid].cookies)
+                        logger.debug('post set-cookies ' + cookieStore[z9sessionid].cookies)
                     }
                     else {
-                        logger.info("removing $cookie for $z9sessionid")
-                        logger.info('before post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
+                        logger.debug("removing $cookie for $z9sessionid")
+                        logger.debug('before post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
                         cookieStore.get(z9sessionid)?.cookies?.remove(cookie.name)
-                        logger.info('after post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
+                        logger.debug('after post delete set-cookies ' + cookieStore[z9sessionid]?.cookies)
                     }
                 }
 
@@ -97,11 +97,11 @@ class CookieSwapper {
         response.removeHeaders('Set-Cookie')
 
         if (!cookieStore[z9sessionid]?.cookies) {
-            logger.info("removing $cookieStore.z9sessionid")
+            logger.debug("removing $cookieStore.z9sessionid")
             cookieStore.remove(z9sessionid)
         }
         else {
-            logger.info cookieStore[z9sessionid]
+            logger.debug cookieStore[z9sessionid]
         }
 
 	}

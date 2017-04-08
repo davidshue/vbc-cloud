@@ -48,6 +48,7 @@ public class HttpProxyRequestHandler implements RequestHandler {
 			conn = new DefaultBHttpServerConnection(8 * 1024);
 			conn.setSocketTimeout(2000);
 			conn.bind(socket);
+
 			boolean keepAlive = true;
 			while( keepAlive && !socket.isClosed() ) {
 				// fully read the request, whatever it is
@@ -55,26 +56,35 @@ public class HttpProxyRequestHandler implements RequestHandler {
 				logger.info("Received request: {0} " + request);
 				keepAlive = isKeepAlive(request);
 
-
 				if (request instanceof HttpEntityEnclosingRequest) {
 					conn.receiveRequestEntity((HttpEntityEnclosingRequest) request);
 					HttpEntity entity = ((HttpEntityEnclosingRequest) request)
 							.getEntity();
 					if (entity != null) {
 						// consume all content to allow reuse
-                        byte[] bytes = httpRetry.toByteArray(entity);
-                        ContentType type = ContentType.parse(entity.getContentType().getValue());
-                        HttpEntity byteEntity = new ByteArrayEntity(bytes, type);
+						byte[] bytes = httpRetry.toByteArray(entity);
+						ContentType type = ContentType.parse(entity.getContentType().getValue());
+						HttpEntity byteEntity = new ByteArrayEntity(bytes, type);
 						((HttpEntityEnclosingRequest) request).setEntity(byteEntity);
 					}
 				}
 
 				HttpResponse response = handle(request);
 
-                conn.sendResponseHeader(response);
-                conn.sendResponseEntity(response);
-                conn.flush();
+				if (request.getRequestLine().getUri().startsWith("/enc/")) {
+					logger.debug("require zencode: " + response.getStatusLine());
+					Header header = response.getFirstHeader("Location");
+					if (header != null) {
+						logger.debug("zencode redirect " + header.getValue());
+					}
+				}
+
+				conn.sendResponseHeader(response);
+				conn.sendResponseEntity(response);
+				conn.flush();
 			}
+
+
 
 		} catch (SocketException|ConnectionClosedException e) {
 			logger.warn(e.getMessage());

@@ -113,9 +113,9 @@ public class ProxyExecutor extends Thread implements Proxy {
                 taskExecutor.execute(runner);
 
             }  catch (IOException e) {
-                logger.info(e);
+                logger.error(e.getMessage(), e);
             }
         }
-        logger.info(identifier + " thread existing");
+        logger.info(identifier + " thread exiting...");
 	}
 }

@@ -17,7 +17,7 @@ public class RequestRunner extends Thread  {
     }
 
     public void run() {
-    	logger.info("request runner started.");
+    	logger.debug("request runner started...");
         handler.handleRequest(socket);
     }
 }

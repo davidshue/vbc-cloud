@@ -105,16 +105,16 @@ class EventProcessor {
                     //    return;
                     //}
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
-                    logger.info("firsthand handling response on " + clientContext.getRequest().getRequestLine());
+                    logger.debug("firsthand handling response on " + clientContext.getRequest().getRequestLine());
 
                     String z9sessionId = (String) context.getAttribute("zid");
                     if (StringUtils.isBlank(z9sessionId)) {
-                        logger.info("no zid for " + clientContext.getRequest().getRequestLine());
+                        logger.debug("no zid for " + clientContext.getRequest().getRequestLine());
                         return;
                     }
 
                     if (response.getHeaders("Set-Cookie").length == 0) {
-                        logger.info("no set-cookie for " + clientContext.getRequest().getRequestLine());
+                        logger.debug("no set-cookie for " + clientContext.getRequest().getRequestLine());
                         return;
                     }
 
@@ -122,14 +122,14 @@ class EventProcessor {
                 })
                 .addInterceptorLast((HttpResponse response, HttpContext context) -> {
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
-                    logger.info("secondhand handling response on " + clientContext.getRequest().getRequestLine());
+                    logger.debug("secondhand handling response on " + clientContext.getRequest().getRequestLine());
 
                     response.removeHeaders("node");
                     response.addHeader("node", nodeId);
                     String z9sessionId = (String) context.getAttribute("zid");
 
                     if (StringUtils.isBlank(z9sessionId)) {
-                        logger.info("no zid for " + clientContext.getRequest().getRequestLine());
+                        logger.debug("no zid for " + clientContext.getRequest().getRequestLine());
                         return;
                     }
                     addZ9SessionCookie(response, clientContext);
@@ -155,7 +155,7 @@ class EventProcessor {
     @KafkaListener(id = "eventProcessor", topics = "http_topic")
     public void processHttp(String message) throws IOException, HttpException {
         Z9HttpRequest input = objectMapper.readValue(message, Z9HttpRequest.class);
-        logger.info(input.getOrigin());
+        logger.debug(input.getOrigin());
         if (StringUtils.equals(input.getOrigin(), nodeId)) {
             return;
         }
