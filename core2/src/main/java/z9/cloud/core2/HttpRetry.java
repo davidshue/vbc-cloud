@@ -35,7 +35,7 @@ public class HttpRetry {
             try {
                 count++;
                 if (count > 1) {
-                    logger.info("receiveRequestHeader " + count + " times");
+                    logger.debug("receiveRequestHeader " + count + " times");
                 }
                 return conn.receiveRequestHeader();
             } catch (SocketTimeoutException|ConnectionClosedException e) {
@@ -52,7 +52,7 @@ public class HttpRetry {
             try {
                 count++;
                 if (count > 1) {
-                    logger.info("receiveResponseHeader " + count + " times");
+                    logger.debug("receiveResponseHeader " + count + " times");
                 }
                 return activeConn.receiveResponseHeader();
             } catch (SocketTimeoutException|ConnectionClosedException e) {
@@ -70,7 +70,7 @@ public class HttpRetry {
             try {
                 count++;
                 if (count > 1) {
-                    logger.info("toByteArray " + count + " times");
+                    logger.debug("toByteArray " + count + " times");
                 }
                 return EntityUtils.toByteArray(entity);
             } catch (SocketTimeoutException|ConnectionClosedException e) {
