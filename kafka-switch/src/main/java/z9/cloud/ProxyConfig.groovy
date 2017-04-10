@@ -7,6 +7,7 @@ import org.springframework.core.env.Environment
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import z9.cloud.core2.HttpRetry
 import z9.cloud.http.HttpDelegate
+import z9.cloud.http.HttpProxyExecutor
 import z9.cloud.http.HttpProxyRequestHandler
 /**
  * Created by dshue1 on 3/14/16.
@@ -43,8 +44,11 @@ class ProxyConfig {
 	}
 
 	@Bean
-	httpProxy() {
-		ProxyExecutor proxy = new ProxyExecutor(httpHandler(), taskExecutor())
+	httpProxy(@Value('${proxy.http.port}') int port, @Value('${proxy.http.backlog}') int backlog) {
+		ProxyExecutor proxy = new HttpProxyExecutor(handler: httpHandler(),
+				taskExecutor: taskExecutor(),
+				port: port,
+				backlog: backlog)
 		proxy.startExecutor()
 		proxy
 	}
