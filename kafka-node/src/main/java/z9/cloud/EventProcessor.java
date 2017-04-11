@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -12,6 +13,8 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -30,7 +33,17 @@ import z9.cloud.core2.Z9HttpResponse;
 import z9.cloud.core2.Z9HttpUtils;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 @Component
@@ -78,11 +91,33 @@ class EventProcessor {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @PostConstruct
-    public void afterInit() {
+    public void afterInit() throws NoSuchAlgorithmException, KeyManagementException {
         httpHost = new HttpHost(serverAddress, serverPort, protocol);
+
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+
+        // set up a TrustManager that trusts everything
+        sslContext.init(null, new TrustManager[] { new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers()  {
+                return null;
+            }
+
+            public void checkClientTrusted(X509Certificate[] certs,
+                                           String authType) throws CertificateException {}
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+        } }, new SecureRandom());
         httpClient = HttpClients.custom()
                 .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
                     request.removeHeaders(HTTP.CONTENT_LEN);
+                    /*
+                    Header hostHeader = request.getFirstHeader("Host");
+                    if (hostHeader != null) {
+                        request.removeHeader(hostHeader);
+                        hostHeader = new BasicHeader("Host", serverAddress + ":" + serverPort);
+                        request.addHeader(hostHeader);
+                    }
+                    */
                     String zsessionId = Z9HttpUtils.getZ9SessionId(request);
 
                     context.setAttribute("setZid", Boolean.FALSE);
@@ -104,6 +139,7 @@ class EventProcessor {
                     //if (response.getStatusLine().getStatusCode() != 200) {
                     //    return;
                     //}
+                    mediateLocationHeader(response, context);
                     HttpClientContext clientContext = HttpClientContext.adapt(context);
                     logger.debug("firsthand handling response on " + clientContext.getRequest().getRequestLine());
 
@@ -134,6 +170,9 @@ class EventProcessor {
                     }
                     addZ9SessionCookie(response, clientContext);
                 })
+                .setSSLContext(sslContext)
+                .setSSLHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
+                //.setRedirectStrategy(new SSLRedirectStrategy())
                 .build();
     }
 
@@ -202,6 +241,30 @@ class EventProcessor {
             return response;
         } finally {
             IOUtils.closeQuietly(response);
+        }
+    }
+
+    private void mediateLocationHeader(HttpResponse response, HttpContext context) {
+        Header locationHeader = response.getFirstHeader("Location");
+        try {
+            HttpClientContext clientContext = HttpClientContext.adapt(context);
+            Header sslHeader = clientContext.getRequest().getFirstHeader("onSsl");
+            boolean onSsl = false;
+            if (sslHeader != null) {
+                onSsl = Integer.valueOf(sslHeader.getValue()) == 1;
+            }
+            if (locationHeader != null) {
+                URI uri = new URI(locationHeader.getValue());
+                if (uri.getScheme() != null && onSsl) {
+                    response.removeHeader(locationHeader);
+                    URIBuilder uriBuilder = new URIBuilder(uri);
+                    uriBuilder.setScheme("https");
+                    locationHeader = new BasicHeader("Location", uriBuilder.build().toString());
+                    response.addHeader(locationHeader);
+                }
+            }
+        } catch (URISyntaxException e) {
+            logger.warn(e.getMessage(), e);
         }
     }
 }

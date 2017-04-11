@@ -19,6 +19,8 @@ public abstract class ProxyExecutor extends Thread implements Proxy {
     private int backlog = -1;
 	private ServerSocket serverSocket;
 	private String identifier = "proxy";
+
+	private boolean secure = false;
 	
 	private boolean running = false;
 
@@ -58,6 +60,14 @@ public abstract class ProxyExecutor extends Thread implements Proxy {
      */
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public boolean isSecure() {
+        return secure;
+    }
+
+    public void setSecure(boolean secure) {
+        this.secure = secure;
     }
 
     /**
@@ -112,7 +122,7 @@ public abstract class ProxyExecutor extends Thread implements Proxy {
                 InetAddress addr = s.getInetAddress();
                 logger.debug("Received a new connection from (" + addr.getHostAddress() + "): " + addr.getHostName());
 
-                RequestRunner runner = new RequestRunner(handler, s);
+                RequestRunner runner = new RequestRunner(handler, s, secure);
                 taskExecutor.execute(runner);
 
             }  catch (IOException e) {

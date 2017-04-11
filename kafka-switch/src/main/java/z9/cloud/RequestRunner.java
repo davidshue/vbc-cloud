@@ -10,14 +10,16 @@ public class RequestRunner extends Thread  {
 
     private RequestHandler handler;
     private Socket socket;
+    private boolean secure = false;
 
-    public RequestRunner(RequestHandler handler, Socket socket) {
+    public RequestRunner(RequestHandler handler, Socket socket, boolean secure) {
         this.handler = handler;
         this.socket = socket;
+        this.secure = secure;
     }
 
     public void run() {
     	logger.debug("request runner started...");
-        handler.handleRequest(socket);
+        handler.handleRequest(socket, secure);
     }
 }
