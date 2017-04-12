@@ -246,23 +246,41 @@ class EventProcessor {
 
     private void mediateLocationHeader(HttpResponse response, HttpContext context) {
         Header locationHeader = response.getFirstHeader("Location");
+        if (locationHeader == null || StringUtils.isBlank(locationHeader.getValue())) {
+            return;
+        }
         try {
             HttpClientContext clientContext = HttpClientContext.adapt(context);
+
             Header sslHeader = clientContext.getRequest().getFirstHeader("onSsl");
             boolean onSsl = false;
             if (sslHeader != null) {
                 onSsl = Integer.valueOf(sslHeader.getValue()) == 1;
             }
-            if (locationHeader != null) {
-                URI uri = new URI(locationHeader.getValue());
-                if (uri.getScheme() != null && onSsl) {
-                    response.removeHeader(locationHeader);
-                    URIBuilder uriBuilder = new URIBuilder(uri);
-                    uriBuilder.setScheme("https");
-                    locationHeader = new BasicHeader("Location", uriBuilder.build().toString());
-                    response.addHeader(locationHeader);
+            if (!onSsl) {
+                return;
+            }
+            String domain = "";
+            Header hostHeader = clientContext.getRequest().getFirstHeader("Host");
+            if (hostHeader != null && StringUtils.isNotBlank(hostHeader.getValue())) {
+                String[] args = hostHeader.getValue().split(":");
+                if (args != null && args.length >= 1) {
+                    domain = args[0];
                 }
             }
+            if (StringUtils.isBlank(domain)) {
+                return;
+            }
+
+            URI uri = new URI(locationHeader.getValue());
+            if (uri.getScheme() != null && StringUtils.equalsIgnoreCase(domain, uri.getHost())) {
+                response.removeHeader(locationHeader);
+                URIBuilder uriBuilder = new URIBuilder(uri);
+                uriBuilder.setScheme("https");
+                locationHeader = new BasicHeader("Location", uriBuilder.build().toString());
+                response.addHeader(locationHeader);
+            }
+
         } catch (URISyntaxException e) {
             logger.warn(e.getMessage(), e);
         }
