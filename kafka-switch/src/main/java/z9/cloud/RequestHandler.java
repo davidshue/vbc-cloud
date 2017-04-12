@@ -11,5 +11,5 @@ public interface RequestHandler {
 	 * 
 	 * @param socket    The socket communication back to the client
 	 */
-	public void handleRequest(Socket socket);
+	void handleRequest(Socket socket, boolean secure);
 }
