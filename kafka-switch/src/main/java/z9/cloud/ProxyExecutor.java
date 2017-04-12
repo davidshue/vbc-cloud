@@ -10,40 +10,47 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executor;
 
-public class ProxyExecutor extends Thread implements Proxy {
+public abstract class ProxyExecutor extends Thread implements Proxy {
     private static final Log logger = LogFactory.getLog(ProxyExecutor.class);
 
 	private Executor taskExecutor;
 	private RequestHandler handler;
+    private int port = -1;
+    private int backlog = -1;
 	private ServerSocket serverSocket;
-	private int port = 7009;
-	private int backlog = 50; 
 	private String identifier = "proxy";
+
+	private boolean secure = false;
 	
 	private boolean running = false;
 
-	public ProxyExecutor(RequestHandler handler, Executor taskExecutor) {
-	    this.handler = handler;
-		this.taskExecutor = taskExecutor;
-	}
+    public void setTaskExecutor(Executor taskExecutor) {
+        this.taskExecutor = taskExecutor;
+    }
 
-	/**
-     * @param port the port to set
-     */
+    public void setHandler(RequestHandler handler) {
+        this.handler = handler;
+    }
+
     public void setPort(int port) {
         this.port = port;
     }
 
-    /**
-     * @param backlog the backlog to set
-     */
+    public int getPort() {
+        return port;
+    }
+
     public void setBacklog(int backlog) {
         this.backlog = backlog;
     }
-    
+
+    public int getBacklog() {
+        return backlog;
+    }
+
     /* (non-Javadoc)
-     * @see com.zeronines.proxy.server.Proxy#getIdentifier()
-     */
+                 * @see com.zeronines.proxy.server.Proxy#getIdentifier()
+                 */
     public String getIdentifier() {
         return identifier;
     }
@@ -53,6 +60,14 @@ public class ProxyExecutor extends Thread implements Proxy {
      */
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public boolean isSecure() {
+        return secure;
+    }
+
+    public void setSecure(boolean secure) {
+        this.secure = secure;
     }
 
     /**
@@ -70,10 +85,8 @@ public class ProxyExecutor extends Thread implements Proxy {
         if (running) {
             return;
         }
-        ServerSocketFactory ssf = ServerSocketFactory.getDefault();
         try {
-            serverSocket = ssf.createServerSocket(port, backlog);
-            serverSocket.setReuseAddress(true);
+            serverSocket = createServerSocket();
             this.running = true;
             Thread t = new Thread(this);
             t.start();
@@ -97,7 +110,7 @@ public class ProxyExecutor extends Thread implements Proxy {
     }
 	
 	public void run() {
-        logger.info(identifier + " started, listening on port: " + this.port);
+        logger.info(identifier + " started, listening on port: " + port);
         while (running) {
             try {
                 logger.debug("waiting...");
@@ -109,7 +122,7 @@ public class ProxyExecutor extends Thread implements Proxy {
                 InetAddress addr = s.getInetAddress();
                 logger.debug("Received a new connection from (" + addr.getHostAddress() + "): " + addr.getHostName());
 
-                RequestRunner runner = new RequestRunner(handler, s);
+                RequestRunner runner = new RequestRunner(handler, s, secure);
                 taskExecutor.execute(runner);
 
             }  catch (IOException e) {
@@ -118,4 +131,10 @@ public class ProxyExecutor extends Thread implements Proxy {
         }
         logger.info(identifier + " thread exiting...");
 	}
+
+    protected  ServerSocketFactory createFactory() {
+        return ServerSocketFactory.getDefault();
+    }
+
+    protected abstract ServerSocket createServerSocket() throws IOException;
 }
