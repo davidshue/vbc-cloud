@@ -6,7 +6,7 @@
 
 	<groupId>z9.cloud</groupId>
 	<artifactId>core2</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 
 	<name>core2</name>
 	<description>core library for vbc cloud</description>

@@ -6,7 +6,7 @@
 
 	<groupId>z9.cloud</groupId>
 	<artifactId>vbc-eureka-spring-cloud</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>VBC Cloud discovery</name>
 
@@ -38,7 +38,7 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId> <!--changed-->
-				<version>Camden.SR5</version> <!--changed-->
+				<version>Dalston.RELEASE</version> <!--changed-->
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
