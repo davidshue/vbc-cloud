@@ -14,9 +14,29 @@ hystrix:
 zuul:
   ignoredServices: '*'
   routes:
-    kafka-node: /node/**
+    kafka-node:
+      path: /node/**
+      retryable: true
     configserver: /config/**
-eureka:
-  instance:
-    lease-renewal-interval-in-seconds: 10
-    lease-expiration-duration-in-seconds: 15
+#eureka:
+#  instance:
+#    registry-fetch-interval-seconds: 1
+#    lease-renewal-interval-in-seconds: 2
+#    lease-expiration-duration-in-seconds: 5
+#  client:
+#    initial-instance-info-replication-interval-seconds: 5
+#ribbon:
+#  OkToRetryOnAllOperations: true
+#  ReadTimeout: 3000
+#  ConnectTimeout: 1000
+#  MaxAutoRetries: 1
+#  MaxAutoRetriesNextServer: 1
+#  ServerListRefreshInterval: 1000
+#kafka-node:
+#  ribbon:
+#    MaxAutoRetries: 2
+#    MaxAutoRetriesNextServer: 1
+#    OkToRetryOnAllOperations: true
+#    ServerListRefreshInterval: 2000
+#    ConnectTimeout: 3000
+#    ReadTimeout: 3000

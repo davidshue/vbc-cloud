@@ -50,6 +50,9 @@ public class StickySessionRule extends ClientConfigEnabledRoundRobinRule {
 
     private Server addServer(Object key) {
         Server server = super.choose(key);
+        if (server == null) {
+            return null;
+        }
         Cookie newCookie = new Cookie(COOKIE_NAME, "" + server.hashCode());
         newCookie.setPath("/");
         RequestContext.getCurrentContext().getResponse().addCookie(newCookie);

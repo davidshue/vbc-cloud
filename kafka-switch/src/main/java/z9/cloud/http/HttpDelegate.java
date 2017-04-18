@@ -8,10 +8,13 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import z9.cloud.core2.Z9Header;
 import z9.cloud.core2.Z9HttpRequest;
@@ -28,14 +31,24 @@ import java.util.List;
  */
 class HttpDelegate {
 	private static Log logger = LogFactory.getLog(HttpDelegate.class);
-	@Autowired
-	private NodeService nodeService;
 
+	@Autowired
+	private DiscoveryClient client;
+
+	private String gatewayUri;
 	private RestTemplate restTemplate;
 
 	@PostConstruct
 	public void after() {
 		restTemplate = new RestTemplate();
+
+		List<ServiceInstance> gateways = client.getInstances("gateway");
+		Assert.notEmpty(gateways, "the gateway is not running, switch startup aborted.");
+
+		// for the time being, get the first gateway, we may need to use feign client if there are multiple gateways.
+		ServiceInstance si = gateways.get(0);
+		gatewayUri = si.getUri().toString();
+		logger.info("################# gateway at " + gatewayUri);
 	}
 
 	public HttpResponse handle(HttpRequest request) throws IOException, HttpException {
@@ -50,7 +63,7 @@ class HttpDelegate {
 		HttpEntity<Z9HttpRequest> he = new HttpEntity<>(z9Request, httpHeaders);
 
 		ResponseEntity<Z9HttpResponse> re = restTemplate.exchange(
-				"http://localhost:8005/node/v1/http",
+				gatewayUri + "/node/v1/http",
 				HttpMethod.POST, he, Z9HttpResponse.class);
 
 		Z9HttpResponse z9Response = re.getBody();
