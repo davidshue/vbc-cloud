@@ -3,8 +3,8 @@ package z9.cloud;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +16,7 @@ import z9.cloud.http.NodeService;
 
 @SpringBootApplication
 @EnableEurekaClient
-@EnableFeignClients
+@EnableCircuitBreaker
 @RestController
 public class KafkaSwitchApplication {
     @Autowired

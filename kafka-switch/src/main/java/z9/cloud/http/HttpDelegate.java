@@ -1,5 +1,6 @@
 package z9.cloud.http;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -7,6 +8,10 @@ import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.message.BasicHttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -14,22 +19,28 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import z9.cloud.core2.Z9Header;
 import z9.cloud.core2.Z9HttpRequest;
 import z9.cloud.core2.Z9HttpResponse;
 import z9.cloud.core2.Z9HttpUtils;
+import z9.cloud.core2.Z9ProtocolVersion;
+import z9.cloud.core2.Z9StatusLine;
 
 import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by dshue1 on 3/14/16.
  */
-class HttpDelegate {
+@Component
+public class HttpDelegate {
 	private static Log logger = LogFactory.getLog(HttpDelegate.class);
 
 	@Autowired
@@ -51,6 +62,7 @@ class HttpDelegate {
 		logger.info("################# gateway at " + gatewayUri);
 	}
 
+	@HystrixCommand(fallbackMethod = "fallback")
 	public HttpResponse handle(HttpRequest request) throws IOException, HttpException {
 		Z9HttpRequest z9Request = Z9HttpRequest.toZ9HttpRequest(request);
 		if (Z9HttpUtils.getZ9SessionId(request) == null) {
@@ -90,6 +102,21 @@ class HttpDelegate {
 			}
 		}
 		logger.info("response from " + response.getFirstHeader("node"));
+		return response;
+	}
+
+	public HttpResponse fallback(HttpRequest request) {
+		BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1,
+				HttpStatus.SC_OK, "OK") ;
+		BasicHttpEntity entity = new BasicHttpEntity();
+		byte[] message = "gateway is down".getBytes(Charset.forName("UTF-8"));
+		entity.setContent(new ByteArrayInputStream(message));
+		entity.setContentLength(message.length);
+		response.setEntity(entity);
+
+		// force Content-Length header so the client doesn't expect us to close the connection to end the response
+		response.addHeader("Content-Length", String.valueOf(message.length));
+
 		return response;
 	}
 }
