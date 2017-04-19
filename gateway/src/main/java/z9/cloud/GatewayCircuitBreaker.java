@@ -33,7 +33,7 @@ public class GatewayCircuitBreaker implements ZuulFallbackProvider {
         BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1,
                 org.apache.http.HttpStatus.SC_OK, "OK") ;
         BasicHttpEntity entity = new BasicHttpEntity();
-        byte[] message = "service not available".getBytes(Charset.forName("UTF-8"));
+        byte[] message = "node service not available".getBytes(Charset.forName("UTF-8"));
         entity.setContent(new ByteArrayInputStream(message));
         entity.setContentLength(message.length);
         response.setEntity(entity);
