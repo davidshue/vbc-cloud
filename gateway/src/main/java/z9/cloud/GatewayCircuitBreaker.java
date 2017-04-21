@@ -31,7 +31,7 @@ public class GatewayCircuitBreaker implements ZuulFallbackProvider {
     @PostConstruct
     public void after() throws JsonProcessingException {
         BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1,
-                org.apache.http.HttpStatus.SC_OK, "OK") ;
+                org.apache.http.HttpStatus.SC_REQUEST_TIMEOUT, "Node is not available") ;
         BasicHttpEntity entity = new BasicHttpEntity();
         byte[] message = "node service not available".getBytes(Charset.forName("UTF-8"));
         entity.setContent(new ByteArrayInputStream(message));

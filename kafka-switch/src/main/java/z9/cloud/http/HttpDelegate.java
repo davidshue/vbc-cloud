@@ -107,9 +107,9 @@ public class HttpDelegate {
 
 	public HttpResponse fallback(HttpRequest request) {
 		BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1,
-				HttpStatus.SC_OK, "OK") ;
+				HttpStatus.SC_GATEWAY_TIMEOUT, "Gateway Timeout");
 		BasicHttpEntity entity = new BasicHttpEntity();
-		byte[] message = "gateway is down".getBytes(Charset.forName("UTF-8"));
+		byte[] message = "Service Gateway is not available".getBytes(Charset.forName("UTF-8"));
 		entity.setContent(new ByteArrayInputStream(message));
 		entity.setContentLength(message.length);
 		response.setEntity(entity);
