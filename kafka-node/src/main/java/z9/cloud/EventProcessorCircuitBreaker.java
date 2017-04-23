@@ -251,7 +251,7 @@ public class EventProcessorCircuitBreaker {
 
 
         BasicHttpEntity entity = new BasicHttpEntity();
-        String error = "App Server " + nodeId + " is not available";
+        String error = "App Server for " + nodeId + " is not available";
         byte[] message = error.getBytes(Charset.forName("UTF-8"));
         entity.setContent(new ByteArrayInputStream(message));
         entity.setContentLength(message.length);
