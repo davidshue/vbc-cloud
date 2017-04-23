@@ -10,7 +10,6 @@ import z9.cloud.http.HttpDelegate
 import z9.cloud.http.HttpProxyExecutor
 import z9.cloud.http.HttpProxyRequestHandler
 import z9.cloud.http.HttpsProxyExecutor
-
 /**
  * Created by dshue1 on 3/14/16.
  */
@@ -35,14 +34,16 @@ class ProxyConfig {
 		)
 	}
 
+	/*
 	@Bean
-	httpDelegate() {
+	HttpDelegate httpDelegate() {
 		new HttpDelegate()
 	}
+	*/
 
 	@Bean
-	httpHandler() {
-		new HttpProxyRequestHandler(httpDelegate())
+	httpHandler(HttpDelegate delegate) {
+		new HttpProxyRequestHandler(delegate)
 	}
 
 	@Bean
