@@ -17,7 +17,9 @@ zuul:
     kafka-node:
       path: /node/**
       retryable: true
-    configserver: /config/**
+    configserver:
+      path: /config/**
+      sensitive-headers: Cookie,Set-Cookie
 #eureka:
 #  instance:
 #    registry-fetch-interval-seconds: 1
