@@ -14,10 +14,12 @@ hystrix:
 zuul:
   ignoredServices: '*'
   routes:
-    kafka-node:
+    node:
       path: /node/**
       retryable: true
-    configserver: /config/**
+    configserver:
+      path: /config/**
+      sensitive-headers: Cookie,Set-Cookie
 #eureka:
 #  instance:
 #    registry-fetch-interval-seconds: 1
@@ -32,7 +34,7 @@ zuul:
 #  MaxAutoRetries: 1
 #  MaxAutoRetriesNextServer: 1
 #  ServerListRefreshInterval: 1000
-#kafka-node:
+#node:
 #  ribbon:
 #    MaxAutoRetries: 2
 #    MaxAutoRetriesNextServer: 1

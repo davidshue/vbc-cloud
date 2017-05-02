@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: kafka-switch
-
-#node:
-#  ribbon:
-#    ConnectTimeout: 30000
-#    ReadTimeout: 600000

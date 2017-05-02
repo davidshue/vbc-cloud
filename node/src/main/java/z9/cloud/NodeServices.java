@@ -4,9 +4,9 @@ package z9.cloud;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,8 +29,6 @@ public class NodeServices {
 	private static List<String> WRITE_METHODS = Arrays.asList("POST", "post", "PUT", "put", "DELETE", "delete", "PATCH", "patch");
 
 
-	@Autowired
-	private AmqpTemplate template;
 
 	@Autowired
 	@Qualifier("env")
@@ -41,6 +39,9 @@ public class NodeServices {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+
+	@Autowired
+	private KafkaTemplate<Integer, Object> template;
 
 
 	@RequestMapping(value = "/v1", method=RequestMethod.POST)
@@ -56,7 +57,7 @@ public class NodeServices {
 
 		if (out.getStatusLine().getStatusCode() < 400) {
 			input.setOrigin(env);
-			template.convertAndSend("http_exchange", "broadcast", input);
+			template.send("http_topic",  input);
 			if (WRITE_METHODS.contains(input.getRequestLine().getMethod())) {
 				sessionHelper.saveRevival(input);
 			}

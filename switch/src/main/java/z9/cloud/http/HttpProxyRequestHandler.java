@@ -17,6 +17,7 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.DefaultBHttpServerConnection;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +43,14 @@ public class HttpProxyRequestHandler implements RequestHandler {
 		this.httpDelegate = httpDelegate;
 	}
 
-	public void handleRequest(Socket socket) {
+	@Override
+	public void handleRequest(Socket socket, boolean secure) {
 		DefaultBHttpServerConnection conn = null;
 		try {
 			conn = new DefaultBHttpServerConnection(8 * 1024);
 			conn.setSocketTimeout(2000);
 			conn.bind(socket);
+
 			boolean keepAlive = true;
 			while( keepAlive && !socket.isClosed() ) {
 				// fully read the request, whatever it is
@@ -55,6 +58,12 @@ public class HttpProxyRequestHandler implements RequestHandler {
 				logger.info("Received request: {0} " + request);
 				keepAlive = isKeepAlive(request);
 
+				if (secure) {
+					request.addHeader(new BasicHeader("onSsl", "1"));
+				}
+				else {
+					request.addHeader(new BasicHeader("onSsl", "0"));
+				}
 
 				if (request instanceof HttpEntityEnclosingRequest) {
 					conn.receiveRequestEntity((HttpEntityEnclosingRequest) request);
@@ -62,19 +71,29 @@ public class HttpProxyRequestHandler implements RequestHandler {
 							.getEntity();
 					if (entity != null) {
 						// consume all content to allow reuse
-                        byte[] bytes = httpRetry.toByteArray(entity);
-                        ContentType type = ContentType.parse(entity.getContentType().getValue());
-                        HttpEntity byteEntity = new ByteArrayEntity(bytes, type);
+						byte[] bytes = httpRetry.toByteArray(entity);
+						ContentType type = ContentType.parse(entity.getContentType().getValue());
+						HttpEntity byteEntity = new ByteArrayEntity(bytes, type);
 						((HttpEntityEnclosingRequest) request).setEntity(byteEntity);
 					}
 				}
 
 				HttpResponse response = handle(request);
 
-                conn.sendResponseHeader(response);
-                conn.sendResponseEntity(response);
-                conn.flush();
+				if (request.getRequestLine().getUri().startsWith("/enc/")) {
+					logger.debug("require zencode: " + response.getStatusLine());
+					Header header = response.getFirstHeader("Location");
+					if (header != null) {
+						logger.debug("zencode redirect " + header.getValue());
+					}
+				}
+
+				conn.sendResponseHeader(response);
+				conn.sendResponseEntity(response);
+				conn.flush();
 			}
+
+
 
 		} catch (SocketException|ConnectionClosedException e) {
 			logger.warn(e.getMessage());
