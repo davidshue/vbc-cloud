@@ -8,11 +8,11 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>kafka-switch</artifactId>
+	<artifactId>switch</artifactId>
 	<packaging>jar</packaging>
 
-	<name>kafka-switch</name>
-	<description>VBC Cloud kafka-switch</description>
+	<name>switch</name>
+	<description>VBC Cloud switch</description>
 
 	<dependencies>
 		<dependency>

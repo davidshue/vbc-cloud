@@ -50,7 +50,7 @@ public class GatewayCircuitBreaker implements ZuulFallbackProvider {
     }
     @Override
     public String getRoute() {
-        return "kafka-node";
+        return "node";
     }
 
     @Override

@@ -24,8 +24,8 @@
 		<module>core2</module>
 		<module>turbine</module>
 		<module>security</module>
-		<module>kafka-node</module>
-		<module>kafka-switch</module>
+		<module>node</module>
+		<module>switch</module>
 	</modules>
 
 	<properties>

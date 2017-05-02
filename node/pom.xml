@@ -9,11 +9,11 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>kafka-node</artifactId>
+    <artifactId>node</artifactId>
     <packaging>jar</packaging>
 
-    <name>kafka-node</name>
-    <description>VBC cloud kafka-node</description>
+    <name>node</name>
+    <description>VBC cloud node</description>
 
     <dependencies>
         <dependency>
