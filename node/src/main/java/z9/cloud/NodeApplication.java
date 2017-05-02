@@ -10,9 +10,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableEurekaClient
 @EnableCircuitBreaker
 @EnableAsync
-public class KafkaNodeApplication {
+public class NodeApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(KafkaNodeApplication.class, args);
+        SpringApplication.run(NodeApplication.class, args);
     }
 }

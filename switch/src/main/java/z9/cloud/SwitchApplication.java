@@ -18,12 +18,12 @@ import z9.cloud.http.NodeService;
 @EnableEurekaClient
 @EnableCircuitBreaker
 @RestController
-public class KafkaSwitchApplication {
+public class SwitchApplication {
     @Autowired
     private NodeService nodeService;
 
     public static void main(String[] args) {
-        SpringApplication.run(KafkaSwitchApplication.class, args);
+        SpringApplication.run(SwitchApplication.class, args);
     }
 
     @RequestMapping(value = "/v1", method= RequestMethod.POST)
