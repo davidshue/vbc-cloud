@@ -5,11 +5,11 @@ public interface Proxy {
     /**
      * @return the identifier
      */
-    public String getIdentifier();
+    String getIdentifier();
 
-    public void startExecutor();
+    void startExecutor();
 
-    public void stopExecutor();
-    
-    public boolean isRunning();
+    void stopExecutor();
+
+    boolean isRunning();
 }

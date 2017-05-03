@@ -1,61 +1,58 @@
 package z9.cloud;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import z9.cloud.core2.HttpRetry;
-import z9.cloud.core2.Z9HttpRequest;
-import z9.cloud.core2.Z9HttpResponse;
 import z9.cloud.core2.Z9HttpUtils;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
+/**
+ * Created by david on 4/21/17.
+ */
 @Component
-class EventProcessor {
+public class EventProcessorCircuitBreaker {
     private final Log logger = LogFactory.getLog(getClass());
-
-    public static final Long THIRTY_MIN = 30*60_000L;
-
-    public static final Long ONE_HOUR = 60 * 60_000L;
-
-    @Value("${http.waittime}")
-    private long waitTime;
 
     @Value("${http.port}")
     private int serverPort;
@@ -80,15 +77,9 @@ class EventProcessor {
     @Autowired
     private HttpRetry httpRetry;
 
-    @Autowired
-    private SessionHelper sessionHelper;
-
-
     private HttpHost httpHost;
 
     private CloseableHttpClient httpClient;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @PostConstruct
     public void afterInit() throws NoSuchAlgorithmException, KeyManagementException {
@@ -190,60 +181,6 @@ class EventProcessor {
         }
     }
 
-
-    @KafkaListener(id = "eventProcessor", topics = "http_topic")
-    public void processHttp(String message) throws IOException, HttpException {
-        Z9HttpRequest input = objectMapper.readValue(message, Z9HttpRequest.class);
-        logger.debug(input.getOrigin());
-        if (StringUtils.equals(input.getOrigin(), nodeId)) {
-            return;
-        }
-
-        if ((System.currentTimeMillis() - input.getTimestamp()) >= THIRTY_MIN) {
-            String z9SessionId = input.getZ9SessionId();
-            if (z9SessionId != null) {
-                List<Revival> revivals = sessionHelper.revive(nodeId, z9SessionId);
-                revivals.forEach((Revival revival) -> {
-                            try {
-                                executeHttp(revival.getRequest());
-                            } catch (IOException | HttpException e) {
-                                logger.error(e.getMessage(), e);
-                            }
-                        }
-                );
-            }
-        }
-
-        executeHttp(input);
-    }
-
-    public Z9HttpResponse executeHttp(Z9HttpRequest input) throws IOException, HttpException {
-        HttpRequest request = input.toBasicHttpRequest();
-        HttpResponse response = exchange(request);
-
-        return Z9HttpResponse.toZ9HttpResponse(response);
-    }
-
-    private HttpResponse exchange(HttpRequest request) throws IOException {
-        CloseableHttpResponse response = null;
-
-        try {
-            response = httpClient.execute(httpHost, request);
-
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                byte[] bytes = httpRetry.toByteArray(response.getEntity());
-
-                HttpEntity byteArrayEntity = new ByteArrayEntity(bytes);
-                response.setEntity(byteArrayEntity);
-            }
-            logger.info("Received response: {0} " + response);
-            return response;
-        } finally {
-            IOUtils.closeQuietly(response);
-        }
-    }
-
     private void mediateLocationHeader(HttpResponse response, HttpContext context) {
         Header locationHeader = response.getFirstHeader("Location");
         if (locationHeader == null || StringUtils.isBlank(locationHeader.getValue())) {
@@ -284,5 +221,45 @@ class EventProcessor {
         } catch (URISyntaxException e) {
             logger.warn(e.getMessage(), e);
         }
+    }
+
+    @HystrixCommand(fallbackMethod = "fallback")
+    public HttpResponse exchange(HttpRequest request) throws IOException {
+        CloseableHttpResponse response = null;
+
+        try {
+            response = httpClient.execute(httpHost, request);
+
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                byte[] bytes = httpRetry.toByteArray(response.getEntity());
+
+                HttpEntity byteArrayEntity = new ByteArrayEntity(bytes);
+                response.setEntity(byteArrayEntity);
+            }
+            logger.info("Received response: {0} " + response);
+            return response;
+        } finally {
+            IOUtils.closeQuietly(response);
+        }
+    }
+
+    public HttpResponse fallback(HttpRequest request) throws IOException {
+        logger.warn("Circuit Breaker tripped for " + nodeId);
+        BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1,
+                HttpStatus.SC_OK, "OK");
+
+
+        BasicHttpEntity entity = new BasicHttpEntity();
+        String error = "App Server for " + nodeId + " is not available";
+        byte[] message = error.getBytes(Charset.forName("UTF-8"));
+        entity.setContent(new ByteArrayInputStream(message));
+        entity.setContentLength(message.length);
+        response.setEntity(entity);
+
+        // force Content-Length header so the client doesn't expect us to close the connection to end the response
+        response.addHeader("Content-Length", String.valueOf(message.length));
+
+        return response;
     }
 }
