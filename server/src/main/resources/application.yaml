@@ -6,7 +6,7 @@ server:
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: vbc-server
   client:
     registerWithEureka: false
     fetchRegistry: false
