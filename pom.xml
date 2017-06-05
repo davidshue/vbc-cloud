@@ -85,7 +85,7 @@
 					<imageName>davidshue/vbc-${project.artifactId}</imageName>
 					<baseImage>java:8</baseImage>
 					<cmd>["/opt/run.sh"]</cmd>
-					<pushImage>false</pushImage>
+					<pushImage>true</pushImage>
 					<maintainer>
 						David Shue (davidcshue@gmail.com)
 					</maintainer>
