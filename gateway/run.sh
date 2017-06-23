@@ -2,4 +2,5 @@
 
 PROFILE=${VBC_PROFILE:-"default"}
 
-java -jar -Dspring.profiles.active=$PROFILE /opt/gateway-*.jar
+cd /opt
+java -jar -Dspring.profiles.active=$PROFILE gateway-*.jar

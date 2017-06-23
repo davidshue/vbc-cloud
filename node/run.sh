@@ -2,4 +2,5 @@
 
 PROFILE=${VBC_PROFILE:-"default"}
 
-java -jar -Dspring.profiles.active=$PROFILE /opt/node-*.jar
+cd /opt
+java -jar -Dspring.profiles.active=$PROFILE node-*.jar
