@@ -40,6 +40,8 @@ services:
     hostname: "vbc-server"
     ports:
       - "8761:8761"
+    depends_on:
+      - config
     networks:
       vbc-net:
         aliases:
@@ -49,6 +51,8 @@ services:
     hostname: "vbc-gateway"
     ports:
       - "8005:8005"
+    depends_on:
+      - server
     networks:
       vbc-net:
         aliases:
@@ -60,6 +64,8 @@ services:
       - "8201:8201"
     environment:
       - VBC_PROFILE=node1
+    depends_on:
+        - server
     networks:
       vbc-net:
         aliases:
@@ -71,6 +77,8 @@ services:
       - "8202:8202"
     environment:
       - VBC_PROFILE=node2
+    depends_on:
+      - server
     networks:
       vbc-net:
         aliases:
@@ -84,6 +92,8 @@ services:
       - "7443:7443"
     volumes:
       - "/Users/david/workspace/vbc-cloud/switch/src/main/resources/vbc.jks:/etc/zeronines/vbc/vbc.jks:ro"
+    depends_on:
+      - gateway
     networks:
       vbc-net:
         aliases:
