@@ -1,0 +1,18 @@
+version: "3"
+services:
+  config:
+    image: davidshue/vbc-config:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 200M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "80:8080"
+    networks:
+      - webnet
+networks:
+  webnet:

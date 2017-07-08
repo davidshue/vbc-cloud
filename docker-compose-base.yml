@@ -1,0 +1,30 @@
+version: "3"
+services:
+  mongo:
+    image: "tutum/mongodb:3.2"
+    hostname: "vbc-mongo"
+    ports:
+      - "27017:27017"
+      - "28017:28017"
+    environment:
+      - MONGODB_USER=z9user
+      - MONGODB_DATABASE=vbc
+      - MONGODB_PASS=password
+    networks:
+      net:
+        aliases:
+          - vbc-mongo
+  kafka:
+    image: "spotify/kafka:latest"
+    hostname: "vbc-kafka"
+    ports:
+      - "2181:2181"
+      - "9092:9092"
+    environment:
+      - ADVERTISED_HOST=vbc-kafka
+    networks:
+      net:
+        aliases:
+          - vbc-kafka
+networks:
+  net:

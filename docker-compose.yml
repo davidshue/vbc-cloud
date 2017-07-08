@@ -11,7 +11,7 @@ services:
       - MONGODB_DATABASE=vbc
       - MONGODB_PASS=password
     networks:
-      vbc-net:
+      net:
         aliases:
           - vbc-mongo
   kafka:
@@ -23,7 +23,7 @@ services:
     environment:
       - ADVERTISED_HOST=vbc-kafka
     networks:
-      vbc-net:
+      net:
         aliases:
           - vbc-kafka
   config:
@@ -32,7 +32,7 @@ services:
     ports:
       - "8888:8888"
     networks:
-      vbc-net:
+      net:
         aliases:
           - vbc-config
   server:
@@ -43,7 +43,7 @@ services:
     depends_on:
       - config
     networks:
-      vbc-net:
+      net:
         aliases:
           - vbc-server
   gateway:
@@ -54,7 +54,7 @@ services:
     depends_on:
       - server
     networks:
-      vbc-net:
+      net:
         aliases:
           - vbc-gateway
   node1:
@@ -67,7 +67,7 @@ services:
     depends_on:
         - server
     networks:
-      vbc-net:
+      net:
         aliases:
           - vbc-node1
   node2:
@@ -80,7 +80,7 @@ services:
     depends_on:
       - server
     networks:
-      vbc-net:
+      net:
         aliases:
           - vbc-node2
   switch:
@@ -95,8 +95,8 @@ services:
     depends_on:
       - gateway
     networks:
-      vbc-net:
+      net:
         aliases:
           - vbc-switch
 networks:
-  vbc-net:
+  net:
