@@ -83,11 +83,9 @@
 				</executions>
 				<configuration>
 					<imageName>davidshue/vbc-${project.artifactId}</imageName>
-					<baseImage>java:8</baseImage>
+					<baseImage>openjdk:8-alpine</baseImage>
 					<runs>
-						<run>apt-get update</run>
-						<run>apt-get install -y vim</run>
-						<run>apt-get install -y less</run>
+						<run>apk --update add bash vim less</run>
 					</runs>
 					<cmd>["/opt/run.sh"]</cmd>
 					<pushImage>true</pushImage>

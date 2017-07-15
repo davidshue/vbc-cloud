@@ -31,6 +31,8 @@ services:
     hostname: "vbc-config"
     ports:
       - "8888:8888"
+    environment:
+      - JAVA_OPTS=-server -Xms32m -Xmx64m -XX:+UseParallelOldGC
     networks:
       net:
         aliases:
@@ -42,6 +44,8 @@ services:
       - "8761:8761"
     depends_on:
       - config
+    environment:
+      - JAVA_OPTS=-server -Xms32m -Xmx64m -XX:+UseParallelOldGC
     networks:
       net:
         aliases:
@@ -52,7 +56,12 @@ services:
     ports:
       - "8005:8005"
     depends_on:
+      - config
       - server
+    environment:
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - CONFIG_HOST=vbc-config
+      - CONFIG_PORT=8888
     networks:
       net:
         aliases:
@@ -64,8 +73,14 @@ services:
       - "8201:8201"
     environment:
       - VBC_PROFILE=node1
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - CONFIG_HOST=vbc-config
+      - CONFIG_PORT=8888
     depends_on:
-        - server
+      - mongo
+      - kafka
+      - config
+      - server
     networks:
       net:
         aliases:
@@ -77,7 +92,13 @@ services:
       - "8202:8202"
     environment:
       - VBC_PROFILE=node2
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - CONFIG_HOST=vbc-config
+      - CONFIG_PORT=8888
     depends_on:
+      - mongo
+      - kafka
+      - config
       - server
     networks:
       net:
@@ -94,6 +115,10 @@ services:
       - "/Users/david/workspace/vbc-cloud/switch/src/main/resources/vbc.jks:/etc/zeronines/vbc/vbc.jks:ro"
     depends_on:
       - gateway
+    environment:
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - GATEWAY_HOST=vbc-gateway
+      - GATEWAY_PORT=8005
     networks:
       net:
         aliases:
