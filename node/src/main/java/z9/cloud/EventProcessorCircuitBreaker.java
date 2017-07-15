@@ -163,7 +163,7 @@ public class EventProcessorCircuitBreaker {
                 })
                 .setSSLContext(sslContext)
                 .setSSLHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
-                //.setRedirectStrategy(new SSLRedirectStrategy())
+                .setRedirectStrategy(new SSLRedirectStrategy())
                 .build();
     }
 
@@ -239,6 +239,9 @@ public class EventProcessorCircuitBreaker {
             }
             logger.info("Received response: {0} " + response);
             return response;
+        } catch (Exception e) {
+            logger.warn("node circuitbreaker tripped", e);
+            throw e;
         } finally {
             IOUtils.closeQuietly(response);
         }
