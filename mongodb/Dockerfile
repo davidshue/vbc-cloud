@@ -16,12 +16,13 @@ ENV AUTH yes
 ENV STORAGE_ENGINE wiredTiger
 ENV JOURNALING yes
 
-ADD run.sh /opt/run.sh
-ADD init_mongodb.sh /opt/init_mongodb.sh
+WORKDIR /opt
+COPY run.sh .
+COPY init_mongodb.sh .
 
-RUN chmod +x /opt/run.sh
-RUN chmod +x /opt/init_mongodb.sh
+RUN chmod +x run.sh
+RUN chmod +x init_mongodb.sh
 
 EXPOSE 27017 28017
 
-CMD ["/opt/run.sh"]
+CMD ["./run.sh"]

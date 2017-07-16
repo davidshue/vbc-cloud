@@ -18,7 +18,7 @@ fi
 $cmd &
 
 if [ ! -f /data/db/.init_mongodb_set ]; then
-    /opt/init_mongodb.sh
+    ./init_mongodb.sh
 fi
 
 fg
