@@ -88,7 +88,7 @@
 						<run>apk --update add bash vim less</run>
 					</runs>
 					<cmd>["/opt/run.sh"]</cmd>
-					<pushImage>true</pushImage>
+					<pushImage>false</pushImage>
 					<forceTags>true</forceTags>
 					<maintainer>
 						David Shue (davidcshue@gmail.com)

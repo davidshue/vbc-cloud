@@ -20,4 +20,4 @@ while ! nc -z ${CONFIG_HOST} ${CONFIG_PORT};
 PROFILE=${VBC_PROFILE:-"default"}
 
 cd /opt
-java $JAVA_OPTS -jar -Dspring.profiles.active=$PROFILE gateway-*.jar
+java $JAVA_OPTS -jar -Dspring.profiles.active=$PROFILE $ENVIRONMENT_ARGS gateway-*.jar

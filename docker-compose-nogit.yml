@@ -1,0 +1,131 @@
+version: "3"
+services:
+  mongo:
+    image: "davidshue/mongodb:3.4"
+    hostname: "vbc-mongo"
+    ports:
+      - "27017:27017"
+      - "28017:28017"
+    environment:
+      - MONGODB_USER=z9user
+      - MONGODB_DATABASE=vbc
+      - MONGODB_PASS=password
+    networks:
+      net:
+        aliases:
+          - vbc-mongo
+  kafka:
+    image: "spotify/kafka:latest"
+    hostname: "vbc-kafka"
+    ports:
+      - "2181:2181"
+      - "9092:9092"
+    environment:
+      - ADVERTISED_HOST=vbc-kafka
+    networks:
+      net:
+        aliases:
+          - vbc-kafka
+  config:
+    image: "davidshue/vbc-config:latest"
+    hostname: "vbc-config"
+    ports:
+      - "8888:8888"
+    volumes:
+      - /Users/david/workspace/config-repo:/etc/zeronines/vbc/config:ro
+    environment:
+      - JAVA_OPTS=-server -Xms32m -Xmx64m -XX:+UseParallelOldGC
+      - VBC_PROFILE=native
+      - ENVIRONMENT_ARGS=-Dspring.cloud.config.server.native.search_locations=file:/etc/zeronines/vbc/config
+    networks:
+      net:
+        aliases:
+          - vbc-config
+  server:
+    image: "davidshue/vbc-server:latest"
+    hostname: "vbc-server"
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config
+    environment:
+      - JAVA_OPTS=-server -Xms32m -Xmx64m -XX:+UseParallelOldGC
+    networks:
+      net:
+        aliases:
+          - vbc-server
+  gateway:
+    image: "davidshue/vbc-gateway:latest"
+    hostname: "vbc-gateway"
+    ports:
+      - "8005:8005"
+    depends_on:
+      - config
+      - server
+    environment:
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - CONFIG_HOST=vbc-config
+      - CONFIG_PORT=8888
+    networks:
+      net:
+        aliases:
+          - vbc-gateway
+  node1:
+    image: "davidshue/vbc-node:latest"
+    hostname: "vbc-node1"
+    ports:
+      - "8201:8201"
+    environment:
+      - VBC_PROFILE=node1
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - CONFIG_HOST=vbc-config
+      - CONFIG_PORT=8888
+    depends_on:
+      - mongo
+      - kafka
+      - config
+      - server
+    networks:
+      net:
+        aliases:
+          - vbc-node1
+  node2:
+    image: "davidshue/vbc-node:latest"
+    hostname: "vbc-node2"
+    ports:
+      - "8202:8202"
+    environment:
+      - VBC_PROFILE=node2
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - CONFIG_HOST=vbc-config
+      - CONFIG_PORT=8888
+    depends_on:
+      - mongo
+      - kafka
+      - config
+      - server
+    networks:
+      net:
+        aliases:
+          - vbc-node2
+  switch:
+    image: "davidshue/vbc-switch:latest"
+    hostname: "vbc-switch"
+    ports:
+      - "7000:7000"
+      - "7009:7009"
+      - "7443:7443"
+    volumes:
+      - "/Users/david/workspace/vbc-cloud/switch/src/main/resources/vbc.jks:/etc/zeronines/vbc/vbc.jks:ro"
+    depends_on:
+      - gateway
+    environment:
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - GATEWAY_HOST=vbc-gateway
+      - GATEWAY_PORT=8005
+    networks:
+      net:
+        aliases:
+          - vbc-switch
+networks:
+  net:
