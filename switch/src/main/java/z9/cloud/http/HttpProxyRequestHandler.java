@@ -55,6 +55,14 @@ public class HttpProxyRequestHandler implements RequestHandler {
 			while( keepAlive && !socket.isClosed() ) {
 				// fully read the request, whatever it is
 				HttpRequest request = httpRetry.receiveRequestHeader(conn);
+				String host = request.getFirstHeader("Host").getValue();
+				if (host != null) {
+					int dotPos = host.indexOf(":");
+					host = dotPos == -1 ? host: host.substring(0, dotPos);
+					System.out.println("domain: " + host);
+					request.addHeader("domain", host);
+				}
+
 				logger.info("Received request: {0} " + request);
 				keepAlive = isKeepAlive(request);
 

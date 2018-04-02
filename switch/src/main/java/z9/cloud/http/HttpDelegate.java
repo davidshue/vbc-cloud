@@ -105,7 +105,8 @@ public class HttpDelegate {
 		return response;
 	}
 
-	public HttpResponse fallback(HttpRequest request) {
+	public HttpResponse fallback(HttpRequest request, Throwable t) {
+		t.printStackTrace();
 		BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1,
 				HttpStatus.SC_GATEWAY_TIMEOUT, "Gateway Timeout");
 		BasicHttpEntity entity = new BasicHttpEntity();

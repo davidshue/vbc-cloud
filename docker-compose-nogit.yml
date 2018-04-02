@@ -31,8 +31,12 @@ services:
     hostname: "vbc-config"
     ports:
       - "8888:8888"
+    volumes:
+      - /Users/david/workspace/config-repo:/etc/zeronines/vbc/config:ro
     environment:
       - JAVA_OPTS=-server -Xms32m -Xmx64m -XX:+UseParallelOldGC
+      - VBC_PROFILE=native
+      - ENVIRONMENT_ARGS=-Dspring.cloud.config.server.native.search_locations=file:/etc/zeronines/vbc/config
     networks:
       net:
         aliases:

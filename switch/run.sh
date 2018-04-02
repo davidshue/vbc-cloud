@@ -22,4 +22,4 @@ PROFILE=${VBC_PROFILE:-"default"}
 sleep 30;
 
 cd /opt
-java $JAVA_OPTS -jar -Dspring.profiles.active=$PROFILE switch-*.jar
+java $JAVA_OPTS -jar -Dspring.profiles.active=$PROFILE $ENVIRONMENT_ARGS switch-*.jar
