@@ -58,16 +58,19 @@ public class LicenseHasher {
     }
 
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Command: java -jar LicenseGenerator.jar type expiration_date");
+        if (args.length != 3) {
+            System.out.println("Command: java -jar LicenseGenerator.jar domain, type expiration_date");
+            System.out.println("domain can be have wild card only once. It must contain at least two parts without * unless it is just *");
+            System.out.println("valid domain like *.xyz.com, xyz.com. A domain with just * is a master license");
             System.out.println("0-trial, 1-limited, 2-enterprise");
             System.out.println("expiration_date format of yyyy-mm-dd, like 2018-10-10");
             System.exit(1);
         }
-        String type = args[0];
-        LocalDate date = LocalDate.parse(args[1], DateTimeFormatter.ISO_LOCAL_DATE);
+        String domain = args[0];
+        String type = args[1];
+        LocalDate date = LocalDate.parse(args[2], DateTimeFormatter.ISO_LOCAL_DATE);
         long epochDays = date.toEpochDay();
-        String key = encode(type + "|" + epochDays);
+        String key = encode(domain + "|" + type + "|" + epochDays);
         System.out.println(key);
     }
 }

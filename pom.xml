@@ -6,7 +6,7 @@
 
 	<groupId>z9.cloud</groupId>
 	<artifactId>vbc-eureka-spring-cloud</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>0.0.7-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>VBC Cloud discovery</name>
 
@@ -88,7 +88,7 @@
 						<run>apk --update add bash vim less</run>
 					</runs>
 					<cmd>["/opt/run.sh"]</cmd>
-					<pushImage>false</pushImage>
+					<pushImage>true</pushImage>
 					<forceTags>true</forceTags>
 					<maintainer>
 						David Shue (davidcshue@gmail.com)

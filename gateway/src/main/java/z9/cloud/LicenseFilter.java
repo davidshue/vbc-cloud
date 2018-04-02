@@ -1,12 +1,17 @@
 package z9.cloud;
 
 import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.exception.ZuulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by david on 10/15/17.
@@ -27,7 +32,7 @@ public class LicenseFilter extends ZuulFilter {
 
     @Override
     public String filterType() {
-        return "route";
+        return "pre";
     }
 
     @Override
@@ -42,8 +47,15 @@ public class LicenseFilter extends ZuulFilter {
 
     @Override
     public Object run() {
-        if (le.expired()) {
-            throw new UnsupportedOperationException("Your license has expired");
+        ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request =  sra.getRequest();
+
+        String servedDomain = request.getHeader("Domain") != null? request.getHeader("Domain") : "undefined";
+        System.out.println("servedDomain: " + servedDomain);
+
+        if (le.isValid(servedDomain)) {
+            ZuulRuntimeException zre = new ZuulRuntimeException(new ZuulException("Your License Is Not Valid", 400, "License Invalid"));
+            throw zre;
         }
         return null;
     }
