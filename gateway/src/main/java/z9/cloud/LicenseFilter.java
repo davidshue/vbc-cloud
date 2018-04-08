@@ -53,7 +53,7 @@ public class LicenseFilter extends ZuulFilter {
         String servedDomain = request.getHeader("Domain") != null? request.getHeader("Domain") : "undefined";
         System.out.println("servedDomain: " + servedDomain);
 
-        if (le.isValid(servedDomain)) {
+        if (!le.isValid(servedDomain)) {
             ZuulRuntimeException zre = new ZuulRuntimeException(new ZuulException("Your License Is Not Valid", 400, "License Invalid"));
             throw zre;
         }

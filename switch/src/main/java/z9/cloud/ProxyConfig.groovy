@@ -59,9 +59,9 @@ class ProxyConfig {
 	}
 
 	@Bean
-	httpsProxy(@Value('${proxy.https.port: 7443}') int port,
-			   @Value('${proxy.https.backlog: 50}') int backlog,
-			   @Value('${proxy.https.passcode: changeit}') String keyPass) {
+	httpsProxy(@Value('${proxy.https.port:7443}') int port,
+			   @Value('${proxy.https.backlog:50}') int backlog,
+			   @Value('${proxy.https.passcode:changeit}') String keyPass) {
 		ProxyExecutor proxy = new HttpsProxyExecutor(handler: httpHandler(),
 				taskExecutor: taskExecutor(),
 				port: port,

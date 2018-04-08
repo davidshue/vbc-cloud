@@ -5,12 +5,11 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cassandra.config.CassandraCqlClusterFactoryBean;
+import org.springframework.cassandra.config.CassandraCqlSessionFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -31,10 +30,7 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 @EnableCassandraRepositories
-public class AppConfig extends AbstractCassandraConfiguration {
-    @Autowired
-    private Environment environment;
-
+public class AppConfig {
     @Value("${kafka.zookeeper}")
     private String zookeeper;
 
@@ -46,12 +42,6 @@ public class AppConfig extends AbstractCassandraConfiguration {
 
     @Value("${kafka.session.timeout}")
     private String kafkaSessionTimeout;
-
-    @Bean
-    public String env() {
-        return environment.getActiveProfiles().length == 0 ? "default" : environment.getActiveProfiles()[0];
-    }
-
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<Integer, String> kafkaListenerContainerFactory() {
@@ -70,7 +60,7 @@ public class AppConfig extends AbstractCassandraConfiguration {
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, zookeeper);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaGroupPrefix + "-" + env());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaGroupPrefix);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, kafkaAutoCommitInterval);
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, kafkaSessionTimeout);
@@ -102,14 +92,26 @@ public class AppConfig extends AbstractCassandraConfiguration {
         return new KafkaTemplate<>(producerFactory());
     }
 
-    @Override
-    protected String getKeyspaceName() {
-        return "vbc";
+    /*
+     * Factory bean that creates the com.datastax.driver.core.Session instance
+     */
+    public @Bean CassandraCqlClusterFactoryBean cluster() {
+
+        CassandraCqlClusterFactoryBean cluster = new CassandraCqlClusterFactoryBean();
+        cluster.setContactPoints("localhost");
+
+        return cluster;
     }
 
-    @Override
-    public String getContactPoints() {
-        return "localhost";
-    }
+    /*
+     * Factory bean that creates the com.datastax.driver.core.Session instance
+     */
+    public @Bean CassandraCqlSessionFactoryBean session() {
 
+        CassandraCqlSessionFactoryBean session = new CassandraCqlSessionFactoryBean();
+        session.setCluster(cluster().getObject());
+        session.setKeyspaceName("vbc");
+
+        return session;
+    }
 }
