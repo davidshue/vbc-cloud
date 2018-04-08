@@ -57,7 +57,7 @@ public class NodeServices {
 
 		if (out.getStatusLine().getStatusCode() < 400) {
 			input.setOrigin(env);
-			template.send("http_topic",  input);
+			template.send("http_input",  input);
 			if (WRITE_METHODS.contains(input.getRequestLine().getMethod())) {
 				sessionHelper.saveRevival(input);
 			}
@@ -71,7 +71,6 @@ public class NodeServices {
 		Output output = new Output();
 		output.setOutput(input.getName() + " on " + env);
 		output.setCode(200);
-
 		return output;
 	}
 

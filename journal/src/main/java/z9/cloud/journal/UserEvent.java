@@ -34,10 +34,11 @@ public class UserEvent {
         this.content = content;
     }
 
-    public UserEvent(Z9HttpRequest request) {
-        this.pk = new UserEventKey(request);
+    public UserEvent(String message) {
         try {
-            this.content = mapper.writeValueAsString(request);
+            Z9HttpRequest input = mapper.readValue(message, Z9HttpRequest.class);
+            this.pk = new UserEventKey(input);
+            this.content = message;
         } catch(IOException e) {
             // do nothing
         }
