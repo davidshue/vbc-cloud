@@ -5,6 +5,7 @@ import org.springframework.data.cassandra.mapping.Column;
 import org.springframework.data.cassandra.mapping.PrimaryKey;
 import org.springframework.data.cassandra.mapping.Table;
 import z9.cloud.core2.Z9HttpRequest;
+import z9.cloud.core2.Z9ResponseData;
 
 import java.io.IOException;
 
@@ -34,13 +35,29 @@ public class UserEvent {
         this.content = content;
     }
 
-    public UserEvent(String message) {
+    public static UserEvent constructInputUserEvent(String message) {
+        UserEvent event = new UserEvent();
         try {
             Z9HttpRequest input = mapper.readValue(message, Z9HttpRequest.class);
-            this.pk = new UserEventKey(input);
-            this.content = message;
+            event.setPk(new UserEventKey(input));
+            event.setContent(message);
+
         } catch(IOException e) {
             // do nothing
         }
+        return event;
+    }
+
+    public static UserEvent constructOutputUserEvent(String message) {
+        UserEvent event = new UserEvent();
+        try {
+            Z9ResponseData data = mapper.readValue(message, Z9ResponseData.class);
+            event.setPk(new UserEventKey(data));
+            event.setContent(message);
+
+        } catch(IOException e) {
+            // do nothing
+        }
+        return event;
     }
 }

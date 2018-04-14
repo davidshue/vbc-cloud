@@ -13,10 +13,18 @@ class EventProcessor {
     @Autowired
     private UserEventRepository userEventRepository;
 
-    @KafkaListener(id = "eventProcessor", topics = "http_input")
-    public void processHttp(String message) {
-        UserEvent event = new UserEvent(message);
-        logger.debug("inside journal " + event.getPk());
+    @KafkaListener(id = "inputEventProcessor", topics = "http_input")
+    public void processHttpInput(String message) {
+        UserEvent event = UserEvent.constructInputUserEvent(message);
+        logger.debug("inside journal for input" + event.getPk());
+
+        userEventRepository.save(event);
+    }
+
+    @KafkaListener(id = "outputEventProcessor", topics = "http_output")
+    public void processHttpOutput(String message) {
+        UserEvent event = UserEvent.constructOutputUserEvent(message);
+        logger.debug("inside journal for output " + event.getPk());
 
         userEventRepository.save(event);
     }

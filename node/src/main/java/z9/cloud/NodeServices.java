@@ -15,6 +15,7 @@ import z9.cloud.core2.Input;
 import z9.cloud.core2.Output;
 import z9.cloud.core2.Z9HttpRequest;
 import z9.cloud.core2.Z9HttpResponse;
+import z9.cloud.core2.Z9ResponseData;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -61,6 +62,11 @@ public class NodeServices {
 			if (WRITE_METHODS.contains(input.getRequestLine().getMethod())) {
 				sessionHelper.saveRevival(input);
 			}
+			Z9ResponseData data = new Z9ResponseData();
+			data.setId(input.getZ9SessionId());
+			data.setTimestamp(input.getTimestamp());
+			data.setResponse(out);
+			template.send("http_output",  data);
 		}
 
 		return out;

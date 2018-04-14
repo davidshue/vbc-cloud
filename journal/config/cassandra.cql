@@ -4,8 +4,8 @@ CREATE  KEYSPACE IF NOT EXISTS vbc
 CREATE TABLE IF NOT EXISTS
      vbc.user_event (
        user_id text,
-       day text,
-       event_ts timestamp,
+       event_ts timeuuid,
+       type tinyint,
        content text,
-       PRIMARY KEY ((user_id, day), event_ts)
+       PRIMARY KEY ((user_id), event_ts, type)
      ) WITH CLUSTERING ORDER BY (event_ts DESC);
