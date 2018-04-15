@@ -46,7 +46,7 @@ class EventProcessor {
 
 
 
-    @KafkaListener(id = "eventProcessor", topics = "http_topic")
+    @KafkaListener(id = "eventProcessor", topics = "http_input")
     public void processHttp(String message) throws IOException, HttpException {
         Z9HttpRequest input = objectMapper.readValue(message, Z9HttpRequest.class);
         logger.debug(input.getOrigin());

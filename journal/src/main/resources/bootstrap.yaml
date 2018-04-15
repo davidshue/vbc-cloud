@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      failFast: true
+      uri: ${SPRING_CONFIG_URI:http://vbc-config:8888}
+      username: admin
+      password: s3cret

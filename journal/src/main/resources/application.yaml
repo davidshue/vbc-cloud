@@ -1,0 +1,19 @@
+server:
+  port: ${PORT:7190}
+
+spring:
+  application:
+    name: journal
+eureka:
+  instance:
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 15
+
+kafka:
+  zookeeper: vbc-kafka:9092
+  group:
+    prefix: vbc-journal
+  autocommit:
+    interval: 100
+  session:
+    timeout: 15000

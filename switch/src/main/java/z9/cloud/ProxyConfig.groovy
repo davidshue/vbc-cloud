@@ -47,7 +47,8 @@ class ProxyConfig {
 	}
 
 	@Bean
-	httpProxy(@Value('${proxy.http.port}') int port, @Value('${proxy.http.backlog}') int backlog) {
+	httpProxy(@Value('${proxy.http.port: 7009}') int port,
+			  @Value('${proxy.http.backlog: 50}') int backlog) {
 		ProxyExecutor proxy = new HttpProxyExecutor(handler: httpHandler(),
 				taskExecutor: taskExecutor(),
 				port: port,
@@ -58,7 +59,9 @@ class ProxyConfig {
 	}
 
 	@Bean
-	httpsProxy(@Value('${proxy.https.port}') int port, @Value('${proxy.https.backlog}') int backlog) {
+	httpsProxy(@Value('${proxy.https.port:7443}') int port,
+			   @Value('${proxy.https.backlog:50}') int backlog,
+			   @Value('${proxy.https.passcode:changeit}') String keyPass) {
 		ProxyExecutor proxy = new HttpsProxyExecutor(handler: httpHandler(),
 				taskExecutor: taskExecutor(),
 				port: port,
@@ -66,7 +69,7 @@ class ProxyConfig {
 				identifier: 'https',
 				secure: true,
 				keystoreName: '/etc/zeronines/vbc/vbc.jks',
-				keystorePasscode: 'changeit'
+				keystorePasscode: keyPass
 		)
 		proxy.startExecutor()
 		proxy
