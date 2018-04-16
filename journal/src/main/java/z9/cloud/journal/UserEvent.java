@@ -8,12 +8,17 @@ import z9.cloud.core2.Z9HttpRequest;
 import z9.cloud.core2.Z9ResponseData;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Table("user_event")
 public class UserEvent {
     private static ObjectMapper mapper = new ObjectMapper();
     @PrimaryKey
     private UserEventKey pk;
+
+    @Column
+    private Map<String, String> meta;
 
     @Column(value="content")
     private String content;
@@ -25,6 +30,14 @@ public class UserEvent {
 
     public void setPk(UserEventKey pk) {
         this.pk = pk;
+    }
+
+    public Map<String, String> getMeta() {
+        return meta;
+    }
+
+    public void setMeta(Map<String, String> meta) {
+        this.meta = meta;
     }
 
     public String getContent() {
@@ -40,7 +53,11 @@ public class UserEvent {
         try {
             Z9HttpRequest input = mapper.readValue(message, Z9HttpRequest.class);
             event.setPk(new UserEventKey(input));
-            event.setContent(message);
+            Map<String, String> meta = new HashMap<>();
+            meta.put("uri", input.getRequestLine().getUri());
+            meta.put("method", input.getRequestLine().getMethod());
+            event.setMeta(meta);
+            //event.setContent(message);
 
         } catch(IOException e) {
             // do nothing
@@ -53,7 +70,11 @@ public class UserEvent {
         try {
             Z9ResponseData data = mapper.readValue(message, Z9ResponseData.class);
             event.setPk(new UserEventKey(data));
-            event.setContent(message);
+            Map<String, String> meta = new HashMap<>();
+            meta.put("status", String.valueOf(data.getResponse().getStatusLine().getStatusCode()));
+            meta.put("reason", data.getResponse().getStatusLine().getReasonPhrase());
+            event.setMeta(meta);
+            //event.setContent(message);
 
         } catch(IOException e) {
             // do nothing
