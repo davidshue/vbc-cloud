@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS
        user_id text,
        event_ts timeuuid,
        type tinyint,
+       meta map<text, text>,
        content text,
        PRIMARY KEY ((user_id), event_ts, type)
      ) WITH CLUSTERING ORDER BY (event_ts DESC);

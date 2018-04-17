@@ -43,6 +43,12 @@ public class AppConfig {
     @Value("${kafka.session.timeout}")
     private String kafkaSessionTimeout;
 
+    @Value("${cassandra.endpoints:127.0.0.1}")
+    private String cassandraContactPoints;
+
+    @Value("${cassandra.keyspace:vbc}")
+    private String cassandraKeySpace;
+
     @Bean
     public ConcurrentKafkaListenerContainerFactory<Integer, String> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<Integer, String> factory =
@@ -98,7 +104,7 @@ public class AppConfig {
     public @Bean CassandraCqlClusterFactoryBean cluster() {
 
         CassandraCqlClusterFactoryBean cluster = new CassandraCqlClusterFactoryBean();
-        cluster.setContactPoints("localhost");
+        cluster.setContactPoints(cassandraContactPoints);
 
         return cluster;
     }
@@ -110,7 +116,7 @@ public class AppConfig {
 
         CassandraCqlSessionFactoryBean session = new CassandraCqlSessionFactoryBean();
         session.setCluster(cluster().getObject());
-        session.setKeyspaceName("vbc");
+        session.setKeyspaceName(cassandraKeySpace);
 
         return session;
     }
