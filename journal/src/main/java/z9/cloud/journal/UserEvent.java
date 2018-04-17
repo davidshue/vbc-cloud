@@ -48,7 +48,7 @@ public class UserEvent {
         this.content = content;
     }
 
-    public static UserEvent constructInputUserEvent(String message) {
+    public static UserEvent constructInputUserEvent(String message, boolean saveBlob) {
         UserEvent event = new UserEvent();
         try {
             Z9HttpRequest input = mapper.readValue(message, Z9HttpRequest.class);
@@ -57,7 +57,7 @@ public class UserEvent {
             meta.put("uri", input.getRequestLine().getUri());
             meta.put("method", input.getRequestLine().getMethod());
             event.setMeta(meta);
-            //event.setContent(message);
+            if (saveBlob) event.setContent(message);
 
         } catch(IOException e) {
             // do nothing
@@ -65,7 +65,7 @@ public class UserEvent {
         return event;
     }
 
-    public static UserEvent constructOutputUserEvent(String message) {
+    public static UserEvent constructOutputUserEvent(String message, boolean saveBlob) {
         UserEvent event = new UserEvent();
         try {
             Z9ResponseData data = mapper.readValue(message, Z9ResponseData.class);
@@ -74,7 +74,7 @@ public class UserEvent {
             meta.put("status", String.valueOf(data.getResponse().getStatusLine().getStatusCode()));
             meta.put("reason", data.getResponse().getStatusLine().getReasonPhrase());
             event.setMeta(meta);
-            //event.setContent(message);
+            if (saveBlob) event.setContent(message);
 
         } catch(IOException e) {
             // do nothing
