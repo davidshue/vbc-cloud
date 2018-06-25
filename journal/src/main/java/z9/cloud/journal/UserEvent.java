@@ -1,15 +1,18 @@
 package z9.cloud.journal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.cassandra.mapping.Column;
 import org.springframework.data.cassandra.mapping.PrimaryKey;
 import org.springframework.data.cassandra.mapping.Table;
+import z9.cloud.core2.Z9Header;
 import z9.cloud.core2.Z9HttpRequest;
 import z9.cloud.core2.Z9ResponseData;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Table("user_event")
 public class UserEvent {
@@ -56,6 +59,12 @@ public class UserEvent {
             Map<String, String> meta = new HashMap<>();
             meta.put("uri", input.getRequestLine().getUri());
             meta.put("method", input.getRequestLine().getMethod());
+            Optional<Z9Header> result = input.getHeaders().stream()
+                    .filter(header -> StringUtils.containsIgnoreCase(header.getName(), "forwarded"))
+                    .findAny();
+            if (result.isPresent()) {
+                meta.put("origin", result.get().getValue());
+            }
             event.setMeta(meta);
             if (saveBlob) event.setContent(message);
 
