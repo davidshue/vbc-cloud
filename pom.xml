@@ -88,6 +88,9 @@
 						<run>apk --update add bash vim less</run>
 					</runs>
 					<cmd>["/opt/run.sh"]</cmd>
+					<imageTags>
+						<imageTag>${project.version}</imageTag>
+					</imageTags>
 					<pushImage>true</pushImage>
 					<forceTags>true</forceTags>
 					<maintainer>
