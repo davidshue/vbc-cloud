@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vbc-server
+spec:
+  selector:
+    app: vbc-server
+  ports:
+    -
+      nodePort: 31761
+      port: 8761
+      targetPort: 8761
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vbc-server
+  labels:
+    app: vbc-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: vbc-server
+      labels:
+        app: vbc-server
+    spec:
+      containers:
+      - name: vbc-server
+        image: davidshue/vbc-server:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: VBC_PROFILE
+            value: k8s
+          - name: JAVA_OPTS
+            value: -server -Xms32m -Xmx64m -XX:+UseParallelOldGC
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: vbc-server

@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: license
+spec:
+  selector:
+    app: license
+  ports:
+    -
+      nodePort: 31000
+      port: 8080
+      targetPort: 8080
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: license
+  labels:
+    app: license
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: license
+      labels:
+        app: license
+    spec:
+      containers:
+      - name: license
+        image: davidshue/vbc-license:latest
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: license

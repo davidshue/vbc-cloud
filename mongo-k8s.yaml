@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vbc-mongo
+  labels:
+    name: vbc-mongo
+spec:
+  selector:
+    app: vbc-mongo
+  ports:
+    - port: 27017
+      targetPort: 27017
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: vbc-mongo
+  labels:
+    app: vbc-mongo
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: vbc-mongo
+      labels:
+        app: vbc-mongo
+    spec:
+      containers:
+      - name: mongo
+        image: davidshue/mongodb:3.4
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MONGODB_USER
+          value: z9user
+        - name: MONGODB_DATABASE
+          value: vbc
+        - name: MONGODB_PASS
+          value: password
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: vbc-mongo
+
