@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: upsreader
+  labels:
+    app: upsreader
+spec:
+  serviceName: upsreader
+  replicas: 3
+  selector:
+    matchLabels:
+      app: upsreader
+  template:
+    metadata:
+      labels:
+        app: upsreader
+    spec:
+      containers:
+      - name: upsreader
+        image: davidshue/vbc-node:latest
+        ports:
+        - containerPort: 8074
+          name: web
+        env:
+        - name: JAVA_PROPS
+          value: -Drr.config.dir=/srv/app/config
+        - name: JAVA_OPTS
+          value: -server -Xms1024m -Xmx1024m -XX:NewRatio=6 -XX:+UseParallelOldGC -Dconfig.file=/srv/app/config/carnival.conf
+        - name: ADDITIONAL_COMMAND_LINE
+          value: -local rr.jetty.port=8074
+        - name: UPSSTORAGE_TYPE
+          value: hazelcast
+        - name: HZ_GROUP
+          value: ups-carnival-k8s
+        - name: HZ_PASSWORD
+          value: hellokitten
+        - name: HZ_QUORUM
+          value: "1"
+        - name: HZ_ADDRESSES
+          value: upsreader-0.upsreader,upsreader-1.upsreader,upsreader-2.upsreader
+        - name: HORIZON_CLUSTER_NAME
+          value: horizon-qa-k8s
