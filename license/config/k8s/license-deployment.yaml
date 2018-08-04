@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: vbc-license-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vbc-license
+    spec:
+      containers:
+      - name: vbc-license
+        image: davidshue/vbc-license:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080

@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: vbc-node
+  name: vbc-node
+spec:
+  clusterIP: None
+  ports:
+  - port: 8002
+    name: web
+  selector:
+    app: vbc-node
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vbc-node
+  labels:
+    app: vbc-node
+spec:
+  serviceName: vbc-node
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vbc-node
+  template:
+    metadata:
+      labels:
+        app: vbc-node
+    spec:
+      containers:
+      - name: vbc-node
+        image: davidshue/vbc-node:latest
+        ports:
+        - containerPort: 8002
+          name: web
+        env:
+        - name: VBC_PROFILE
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+        - name: JAVA_OPTS
+          value: -server -Xms128m -Xmx256m -XX:+UseParallelOldGC
