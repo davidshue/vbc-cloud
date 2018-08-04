@@ -1,42 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: vbc-node
+  name: vbc-node
+spec:
+  clusterIP: None
+  ports:
+  - port: 8002
+    name: web
+  selector:
+    app: vbc-node
+
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: upsreader
+  name: vbc-node
   labels:
-    app: upsreader
+    app: vbc-node
 spec:
-  serviceName: upsreader
-  replicas: 3
+  serviceName: vbc-node
+  replicas: 2
   selector:
     matchLabels:
-      app: upsreader
+      app: vbc-node
   template:
     metadata:
       labels:
-        app: upsreader
+        app: vbc-node
     spec:
       containers:
-      - name: upsreader
+      - name: vbc-node
         image: davidshue/vbc-node:latest
         ports:
-        - containerPort: 8074
+        - containerPort: 8002
           name: web
         env:
-        - name: JAVA_PROPS
-          value: -Drr.config.dir=/srv/app/config
+        - name: VBC_PROFILE
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
         - name: JAVA_OPTS
-          value: -server -Xms1024m -Xmx1024m -XX:NewRatio=6 -XX:+UseParallelOldGC -Dconfig.file=/srv/app/config/carnival.conf
-        - name: ADDITIONAL_COMMAND_LINE
-          value: -local rr.jetty.port=8074
-        - name: UPSSTORAGE_TYPE
-          value: hazelcast
-        - name: HZ_GROUP
-          value: ups-carnival-k8s
-        - name: HZ_PASSWORD
-          value: hellokitten
-        - name: HZ_QUORUM
-          value: "1"
-        - name: HZ_ADDRESSES
-          value: upsreader-0.upsreader,upsreader-1.upsreader,upsreader-2.upsreader
-        - name: HORIZON_CLUSTER_NAME
-          value: horizon-qa-k8s
+          value: -server -Xms128m -Xmx256m -XX:+UseParallelOldGC
