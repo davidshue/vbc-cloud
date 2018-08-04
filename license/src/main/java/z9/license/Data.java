@@ -1,5 +1,7 @@
 package z9.license;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -7,6 +9,8 @@ public class Data {
     private String domain;
     private int type;
     private String expiration;
+
+    @JsonIgnore
     private LocalDate expDate;
 
     public String getDomain() {

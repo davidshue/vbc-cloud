@@ -1,0 +1,60 @@
+# kubectl create configmap v8-keystore --from-file=/Users/davidshue/Downloads/keystore --append-hash=false
+apiVersion: v1
+kind: Service
+metadata:
+  name: vbc-switch
+spec:
+  selector:
+    app: vbc-switch
+  ports:
+    -
+      name: http
+      nodePort: 31009
+      port: 7009
+      targetPort: 7009
+    -
+      name: https
+      nodePort: 31443
+      port: 7443
+      targetPort: 7443
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vbc-switch
+  labels:
+    app: vbc-switch
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: vbc-switch
+      labels:
+        app: vbc-switch
+    spec:
+      containers:
+      - name: vbc-switch
+        image: davidshue/vbc-switch:latest
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /etc/zeronines/vbc
+          name: keystore-volume
+        env:
+          - name: VBC_PROFILE
+            value: k8s
+          - name: JAVA_OPTS
+            value: -server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+          - name: GATEWAY_HOST
+            value: vbc-gateway
+          - name: GATEWAY_PORT
+            value: "8005"
+      volumes:
+        - name: keystore-volume
+          configMap:
+            name: v8-keystore
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: vbc-switch
