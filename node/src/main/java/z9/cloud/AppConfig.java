@@ -1,5 +1,7 @@
 package z9.cloud;
 
+import com.netflix.hystrix.HystrixCircuitBreaker;
+import com.netflix.hystrix.HystrixCommandMetrics;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
@@ -7,6 +9,8 @@ import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -20,8 +24,13 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import z9.cloud.core2.HttpRetry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import static org.springframework.boot.actuate.health.Status.DOWN;
 
 /**
  * Created by david on 2/8/17.
@@ -109,4 +118,28 @@ public class AppConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
+    @Bean
+    public AbstractHealthIndicator hystrixHealth() {
+        return new AbstractHealthIndicator() {
+            @Override
+            protected void doHealthCheck(Health.Builder builder) throws Exception {
+                List<String> openCircuitBreakers = new ArrayList();
+                Iterator var3 = HystrixCommandMetrics.getInstances().iterator();
+
+                while(var3.hasNext()) {
+                    HystrixCommandMetrics metrics = (HystrixCommandMetrics)var3.next();
+                    HystrixCircuitBreaker circuitBreaker = HystrixCircuitBreaker.Factory.getInstance(metrics.getCommandKey());
+                    if (circuitBreaker != null && circuitBreaker.isOpen()) {
+                        openCircuitBreakers.add(metrics.getCommandGroup().name() + "::" + metrics.getCommandKey().name());
+                    }
+                }
+
+                if (openCircuitBreakers.size() > 0) {
+                    builder.status(DOWN).withDetail("openCircuitBreakers", openCircuitBreakers);
+                } else {
+                    builder.up();
+                }
+            }
+        };
+    }
 }
