@@ -72,6 +72,9 @@ public class HttpDelegate {
 		Arrays.stream(request.getHeaders("Cookie")).forEach(header ->
 			httpHeaders.add(header.getName(), header.getValue())
 		);
+		Header domainHeader = request.getFirstHeader("Domain");
+		if (domainHeader != null) httpHeaders.add("Domain", domainHeader.getValue());
+
 		HttpEntity<Z9HttpRequest> he = new HttpEntity<>(z9Request, httpHeaders);
 
 		ResponseEntity<Z9HttpResponse> re = restTemplate.exchange(
