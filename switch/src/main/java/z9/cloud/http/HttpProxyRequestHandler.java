@@ -55,12 +55,13 @@ public class HttpProxyRequestHandler implements RequestHandler {
 			while( keepAlive && !socket.isClosed() ) {
 				// fully read the request, whatever it is
 				HttpRequest request = httpRetry.receiveRequestHeader(conn);
+				System.out.println("Receiving " + request.getRequestLine().getUri());
 				String host = request.getFirstHeader("Host").getValue();
 				if (host != null) {
 					int dotPos = host.indexOf(":");
 					host = dotPos == -1 ? host: host.substring(0, dotPos);
 					System.out.println("domain: " + host);
-					request.addHeader("domain", host);
+					request.addHeader("Domain", host);
 				}
 
 				logger.info("Received request: {0} " + request);
@@ -98,11 +99,10 @@ public class HttpProxyRequestHandler implements RequestHandler {
 
 				conn.sendResponseHeader(response);
 				conn.sendResponseEntity(response);
+				System.out.println("flushing " + request.getRequestLine().getUri());
 				conn.flush();
+				conn.close();
 			}
-
-
-
 		} catch (SocketException|ConnectionClosedException e) {
 			logger.warn(e.getMessage());
 		} catch (Exception e) {
@@ -146,6 +146,7 @@ public class HttpProxyRequestHandler implements RequestHandler {
 		conn.sendResponseHeader(response);
 		conn.sendResponseEntity(response);
 		conn.flush();
+		conn.close();
 		logger.info("Sent 200 OK");
 	}
 

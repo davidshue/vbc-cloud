@@ -66,10 +66,12 @@ public class LicenseHasher {
             System.out.println("expiration_date format of yyyy-mm-dd, like 2018-10-10");
             System.exit(1);
         }
+
         String domain = args[0];
         String type = args[1];
         LocalDate date = LocalDate.parse(args[2], DateTimeFormatter.ISO_LOCAL_DATE);
         long epochDays = date.toEpochDay();
+
         String key = encode(domain + "|" + type + "|" + epochDays);
         System.out.println(key);
     }

@@ -12,6 +12,9 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
@@ -98,7 +101,8 @@ public class EventProcessorCircuitBreaker {
 
             public void checkServerTrusted(X509Certificate[] certs, String authType) {}
         } }, new SecureRandom());
-        httpClient = HttpClients.custom()
+
+        httpClient = HttpClients.custom().disableRedirectHandling()
                 .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
                     request.removeHeaders(HTTP.CONTENT_LEN);
                     /*
@@ -164,6 +168,7 @@ public class EventProcessorCircuitBreaker {
                 .setSSLContext(sslContext)
                 .setSSLHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
                 .setRedirectStrategy(new SSLRedirectStrategy())
+                .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build())
                 .build();
     }
 
@@ -195,6 +200,7 @@ public class EventProcessorCircuitBreaker {
                 onSsl = Integer.valueOf(sslHeader.getValue()) == 1;
             }
             if (!onSsl) {
+                rewriteLocation(response, locationHeader, false);
                 return;
             }
             String domain = "";
@@ -211,13 +217,33 @@ public class EventProcessorCircuitBreaker {
 
             URI uri = new URI(locationHeader.getValue());
             if (uri.getScheme() != null && StringUtils.equalsIgnoreCase(domain, uri.getHost())) {
-                response.removeHeader(locationHeader);
-                URIBuilder uriBuilder = new URIBuilder(uri);
-                uriBuilder.setScheme("https");
-                locationHeader = new BasicHeader("Location", uriBuilder.build().toString());
-                response.addHeader(locationHeader);
+                rewriteLocation(response, locationHeader, true);
             }
 
+        } catch (URISyntaxException e) {
+            logger.warn(e.getMessage(), e);
+        }
+    }
+
+    private void rewriteLocation(HttpResponse res, Header location, boolean onSsl) {
+        try {
+            URI uri = new URI(location.getValue());
+            if (onSsl) {
+                if ("https".equals(uri.getScheme())) {
+                    return;
+                }
+            }
+            else {
+                if (!"https".equals(uri.getScheme())) {
+                    return;
+                }
+            }
+            res.removeHeader(location);
+            URIBuilder uriBuilder = new URIBuilder(uri);
+            String scheme = onSsl? "https" : "http";
+            uriBuilder.setScheme(scheme);
+            location = new BasicHeader("Location", uriBuilder.build().toString());
+            res.addHeader(location);
         } catch (URISyntaxException e) {
             logger.warn(e.getMessage(), e);
         }
@@ -233,6 +259,7 @@ public class EventProcessorCircuitBreaker {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 byte[] bytes = httpRetry.toByteArray(response.getEntity());
+                System.out.println("bytes length: " +bytes);
 
                 HttpEntity byteArrayEntity = new ByteArrayEntity(bytes);
                 response.setEntity(byteArrayEntity);

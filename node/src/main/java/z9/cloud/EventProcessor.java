@@ -49,7 +49,7 @@ class EventProcessor {
     @KafkaListener(id = "eventProcessor", topics = "http_input")
     public void processHttp(String message) throws IOException, HttpException {
         Z9HttpRequest input = objectMapper.readValue(message, Z9HttpRequest.class);
-        logger.debug(input.getOrigin());
+
         if (StringUtils.equals(input.getOrigin(), nodeId)) {
             return;
         }
@@ -60,7 +60,11 @@ class EventProcessor {
                 List<Revival> revivals = sessionHelper.revive(nodeId, z9SessionId);
                 revivals.forEach((Revival revival) -> {
                             try {
-                                executeHttp(revival.getRequest());
+                                logger.debug("REVIVING " + revival.getUrl());
+                                Z9HttpResponse  res = executeHttp(revival.getRequest());
+                                logger.debug("REVIVING " + revival.getUrl()
+                                    + ", STATUS " + res.getStatusLine().getStatusCode()
+                                    + " " + res.getStatusLine().getReasonPhrase());
                             } catch (IOException | HttpException e) {
                                 logger.error(e.getMessage(), e);
                             }
@@ -68,8 +72,11 @@ class EventProcessor {
                 );
             }
         }
-
-        executeHttp(input);
+        logger.debug("REPLAYING " + input.getRequestLine().getUri() + " FROM " + input.getOrigin());
+        Z9HttpResponse  res = executeHttp(input);
+        logger.debug("REPLAYING " + input.getRequestLine().getUri() + " FROM " + input.getOrigin()
+            + ", STATUS " + res.getStatusLine().getStatusCode()
+            + " " + res.getStatusLine().getReasonPhrase());
     }
 
     public Z9HttpResponse executeHttp(Z9HttpRequest input) throws IOException, HttpException {
