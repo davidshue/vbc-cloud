@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpVersion;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHttpResponse;
-import org.springframework.cloud.netflix.zuul.filters.route.ZuulFallbackProvider;
+import org.springframework.cloud.netflix.zuul.filters.route.FallbackProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
  * Created by david on 4/17/17.
  */
 @Component
-public class GatewayCircuitBreaker implements ZuulFallbackProvider {
+public class GatewayCircuitBreaker implements FallbackProvider {
     private Z9HttpResponse fallback;
     private byte[] fallbackPayload;
 
@@ -54,7 +54,7 @@ public class GatewayCircuitBreaker implements ZuulFallbackProvider {
     }
 
     @Override
-    public ClientHttpResponse fallbackResponse() {
+    public ClientHttpResponse fallbackResponse(String route, Throwable cause) {
         return new ClientHttpResponse() {
             @Override
             public HttpStatus getStatusCode() throws IOException {

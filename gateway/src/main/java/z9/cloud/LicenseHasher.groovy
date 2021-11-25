@@ -1,11 +1,10 @@
 package z9.cloud
 
-import sun.misc.BASE64Decoder
-
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import java.nio.charset.Charset
 import java.security.Key
+
 /**
  * Created by david on 10/8/17.
  */
@@ -19,7 +18,7 @@ class LicenseHasher {
 
     static String decode(String data) {
         Cipher c = createCipher(Cipher.DECRYPT_MODE)
-        byte[] decordedValue = new BASE64Decoder().decodeBuffer(data)
+        byte[] decordedValue = Base64.decoder.decode(data)
         byte[] decValue = c.doFinal(decordedValue)
         new String(decValue)
     }

@@ -259,7 +259,7 @@ public class EventProcessorCircuitBreaker {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 byte[] bytes = httpRetry.toByteArray(response.getEntity());
-                System.out.println("bytes length: " +bytes);
+                System.out.println("bytes length: " + bytes.length);
 
                 HttpEntity byteArrayEntity = new ByteArrayEntity(bytes);
                 response.setEntity(byteArrayEntity);

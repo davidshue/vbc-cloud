@@ -11,13 +11,13 @@ logging:
 
 eureka:
   instance:
-    leaseRenewalIntervalInSeconds: 10
-    statusPageUrlPath: /admin/info
-    healthCheckUrlPath: /admin/health
+    lease-renewal-interval-in-seconds: 10
+    status-page-url-path: /admin/info
+    health-check-url-path: /admin/health
 #    preferIpAddress: true
   client:
-    serviceUrl:
-      defaultZone: http://${eureka.server.hostname:vbc-server}:8761/eureka/
+    service-url:
+      default-zone: http://${eureka.server.hostname:vbc-server}:8761/eureka/
 
 spring:
   application:
@@ -32,17 +32,12 @@ spring:
           uri: https://github.com/davidshue/config-repo
           force-pull: true
           basedir: target/config
-security:
-  basic:
-    enabled: true
-    path: /**
-    real: vbc
-  user:
-    name: admin
-    password: s3cret
-    role: USER
+  security:
+    user:
+      name: admin
+      password: s3cret
 encrypt:
-  keyStore:
+  key-store:
     location: classpath:/server.jks
     password: letmein
     alias: mytestkey

@@ -8,11 +8,11 @@ hystrix:
         isolation:
           strategy: THREAD
           thread:
-            timeoutInMilliseconds: 60000
+            timeout-in-milliseconds: 60000
         timeout:
           enabled: false
 zuul:
-  ignoredServices: '*'
+  ignored-services: '*'
   routes:
     node:
       path: /node/**

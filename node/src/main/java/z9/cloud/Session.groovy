@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = 'session')
 class Session {
 	@Id
-	private String id
+	String id
 
 	String nodeId
 

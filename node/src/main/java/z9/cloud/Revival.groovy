@@ -15,7 +15,7 @@ import z9.cloud.core2.Z9HttpRequest
 @Document(collection = 'revival')
 class Revival {
 	@Id
-	private String id
+	String id
 
 	String z9SessionId
 

@@ -6,31 +6,37 @@
 
 	<groupId>z9.cloud</groupId>
 	<artifactId>vbc-eureka-spring-cloud</artifactId>
-	<version>0.0.7-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	<name>VBC Cloud discovery</name>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.12.RELEASE</version>
+		<version>2.5.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<modules>
 		<module>server</module>
-		<module>gateway</module>
 		<module>config</module>
-		<module>core2</module>
-		<module>turbine</module>
-		<module>security</module>
+		<module>gateway</module>
 		<module>node</module>
 		<module>switch</module>
+		<module>core2</module>
+<!--
+
+		<module>security</module>
+
+-->
+
+
 	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
+		<spring-cloud.version>2020.0.4</spring-cloud.version>
 	</properties>
 
 	<dependencyManagement>
@@ -38,9 +44,21 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId> <!--changed-->
-				<version>Dalston.SR1</version> <!--changed-->
+				<version>${spring-cloud.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy-all</artifactId>
+				<version>2.4.9</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>${pom.groupId}</groupId>
+				<artifactId>core2</artifactId>
+				<version>1.0.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -50,6 +68,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.6.0</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -60,16 +79,16 @@
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
 						<artifactId>groovy-eclipse-compiler</artifactId>
-						<version>2.9.1-01</version>
+						<version>3.7.0</version>
 					</dependency>
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
 						<artifactId>groovy-eclipse-batch</artifactId>
-						<version>2.3.7-01</version>
+						<version>3.0.8-01</version>
 					</dependency>
 				</dependencies>
 			</plugin>
-			<plugin>
+<!--			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>0.4.13</version>
@@ -85,7 +104,7 @@
 					<imageName>davidshue/vbc-${project.artifactId}</imageName>
 					<baseImage>openjdk:8-alpine</baseImage>
 					<runs>
-						<run>apk --update add bash vim less</run>
+						<run>apk &#45;&#45;update add bash vim less</run>
 					</runs>
 					<cmd>["/opt/run.sh"]</cmd>
 					<imageTags>
@@ -112,26 +131,7 @@
 					<registryUrl>https://index.docker.io/v1</registryUrl>
 
 				</configuration>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>spring-snapshots</id>
-			<name>Spring Snapshots</name>
-			<url>https://repo.spring.io/snapshot</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>
