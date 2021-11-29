@@ -27,7 +27,7 @@ class ProxyConfig {
 	}
 
 	@Bean
-	taskExecutor() {
+	poolTaskExecutor() {
 		new ThreadPoolTaskExecutor(
 				corePoolSize: coreSize,
 				maxPoolSize: maxSize,
@@ -51,7 +51,7 @@ class ProxyConfig {
 	httpProxy(@Value('${proxy.http.port: 7009}') int port,
 			  @Value('${proxy.http.backlog: 50}') int backlog) {
 		ProxyExecutor proxy = new HttpProxyExecutor(handler: httpHandler(),
-				taskExecutor: taskExecutor(),
+				taskExecutor: poolTaskExecutor(),
 				port: port,
 				backlog: backlog,
 				identifier: 'http')
@@ -64,7 +64,7 @@ class ProxyConfig {
 			   @Value('${proxy.https.backlog:50}') int backlog,
 			   @Value('${proxy.https.passcode:changeit}') String keyPass) {
 		ProxyExecutor proxy = new HttpsProxyExecutor(handler: httpHandler(),
-				taskExecutor: taskExecutor(),
+				taskExecutor: poolTaskExecutor(),
 				port: port,
 				backlog: backlog,
 				identifier: 'https',

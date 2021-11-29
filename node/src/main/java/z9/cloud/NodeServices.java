@@ -58,7 +58,8 @@ public class NodeServices {
 
 		if (out.getStatusLine().getStatusCode() < 400) {
 			input.setOrigin(env);
-			template.send("http_input",  input);
+			//TODO: kafka needs to work
+			//template.send("http_input",  input);
 			if (WRITE_METHODS.contains(input.getRequestLine().getMethod())) {
 				sessionHelper.saveRevival(input);
 			}
@@ -66,7 +67,8 @@ public class NodeServices {
 			data.setId(input.getZ9SessionId());
 			data.setTimestamp(input.getTimestamp());
 			data.setResponse(out);
-			template.send("http_output",  data);
+			//TODO: kafka needs to work
+			//template.send("http_output",  data);
 		}
 
 		return out;

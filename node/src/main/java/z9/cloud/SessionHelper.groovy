@@ -2,6 +2,7 @@ package z9.cloud
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Example
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import z9.cloud.core2.Z9HttpRequest
@@ -55,9 +56,10 @@ class SessionHelper {
 		if (!sessionId) return
 
 		synchronized (mutex2) {
-			Session current = sessionRepository.findOne(sessionId)
-			if (!current) return
+			Optional<Session> currentOpt = sessionRepository.findAll(Example.of(sessionId))
+			if (currentOpt.empty) return
 
+			Session current = currentOpt.get()
 			if (System.currentTimeMillis() - current.createDate.time >= 15000) {
 				current.createDate = new Date()
 				sessionRepository.save(current)

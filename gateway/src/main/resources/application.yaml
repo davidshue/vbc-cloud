@@ -20,6 +20,14 @@ zuul:
     configserver:
       path: /config/**
       sensitive-headers: Cookie,Set-Cookie
+
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+  instance:
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 15
 #eureka:
 #  instance:
 #    registry-fetch-interval-seconds: 1
@@ -27,16 +35,19 @@ zuul:
 #    lease-expiration-duration-in-seconds: 5
 #  client:
 #    initial-instance-info-replication-interval-seconds: 5
-#ribbon:
-#  OkToRetryOnAllOperations: true
-#  ReadTimeout: 3000
-#  ConnectTimeout: 1000
-#  MaxAutoRetries: 1
-#  MaxAutoRetriesNextServer: 1
-#  ServerListRefreshInterval: 1000
-#node:
-#  ribbon:
-#    MaxAutoRetries: 2
+ribbon:
+  OkToRetryOnAllOperations: true
+  ReadTimeout: 3000
+  ConnectTimeout: 1000
+  MaxAutoRetries: 1
+  MaxAutoRetriesNextServer: 1
+  ServerListRefreshInterval: 1000
+#  eureka:
+#    enabled: true
+node:
+  ribbon:
+    NIWSServerListClassName: com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList
+    MaxAutoRetries: 2
 #    MaxAutoRetriesNextServer: 1
 #    OkToRetryOnAllOperations: true
 #    ServerListRefreshInterval: 2000
