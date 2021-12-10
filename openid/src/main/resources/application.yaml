@@ -1,0 +1,22 @@
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.web.client.RestTemplate: DEBUG
+
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+  instance:
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 15
+endpoints:
+  actuator:
+    enabled: true
+  health:
+    sensitive: false
+management:
+  security:
+    enabled: false

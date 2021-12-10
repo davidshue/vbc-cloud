@@ -24,6 +24,7 @@
 		<module>node</module>
 		<module>switch</module>
 		<module>core2</module>
+		<module>openid</module>
 <!--
 
 		<module>security</module>
