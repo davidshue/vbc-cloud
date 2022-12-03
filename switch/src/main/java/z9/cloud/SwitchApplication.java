@@ -25,7 +25,7 @@ public class SwitchApplication {
         SpringApplication.run(SwitchApplication.class, args);
     }
 
-    @RequestMapping(value = "/v1", method= RequestMethod.POST)
+    @RequestMapping(value = "/v1")
     public ResponseEntity<String> v1() {
         return nodeService.v1();
     }

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>z9.cloud</groupId>
 		<artifactId>vbc-eureka-spring-cloud</artifactId>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>

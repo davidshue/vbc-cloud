@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: zvm-proxy
+
+server:
+  port: 8080
+
+zuul:
+  ignored-services: '*'
+  routes:
+    foos:
+      path: /**
+      ##url: http://appaws.zeronines.net:8080
+      url: http://ec2-54-235-23-17.compute-1.amazonaws.com
+
+#ribbon:
+#  OkToRetryOnAllOperations: true
+#  ReadTimeout: 3000
+#  ConnectTimeout: 1000
+#  MaxAutoRetries: 1
+#  MaxAutoRetriesNextServer: 1
+#  ServerListRefreshInterval: 1000
+#  eureka:
+#    enabled: true
+#foos:
+#  ribbon:
+#    NIWSServerListClassName: com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList
+#    MaxAutoRetries: 2

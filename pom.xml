@@ -6,7 +6,7 @@
 
 	<groupId>z9.cloud</groupId>
 	<artifactId>vbc-eureka-spring-cloud</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>pom</packaging>
 	<name>VBC Cloud discovery</name>
 
@@ -25,6 +25,7 @@
 		<module>switch</module>
 		<module>core2</module>
 		<module>openid</module>
+		<module>zvm</module>
 <!--
 
 		<module>security</module>
@@ -59,7 +60,7 @@
 			<dependency>
 				<groupId>${pom.groupId}</groupId>
 				<artifactId>core2</artifactId>
-				<version>1.0.0</version>
+				<version>1.1.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -111,7 +112,7 @@
 					<imageTags>
 						<imageTag>${project.version}</imageTag>
 					</imageTags>
-					<pushImage>true</pushImage>
+					<pushImage>false</pushImage>
 					<forceTags>true</forceTags>
 					<maintainer>
 						David Shue (davidcshue@gmail.com)

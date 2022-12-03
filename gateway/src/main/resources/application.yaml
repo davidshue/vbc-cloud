@@ -1,3 +1,7 @@
+logging:
+  level:
+    org.springframework.web.client.RestTemplate: DEBUG
+
 spring:
   application:
     name: gateway
@@ -14,12 +18,18 @@ hystrix:
 zuul:
   ignored-services: '*'
   routes:
-    node:
-      path: /node/**
+    zvm-proxy:
+      path: /zvm/**
       retryable: true
-    configserver:
-      path: /config/**
-      sensitive-headers: Cookie,Set-Cookie
+#    node:
+#      path: /node/**
+#      retryable: true
+#    configserver:
+#      path: /config/**
+#      sensitive-headers:
+#    openid-server:
+#      path: /openid/**
+#      sensitive-headers: Cookie,Set-Cookie,device_id,device_name
 
 eureka:
   client:
@@ -44,10 +54,22 @@ ribbon:
   ServerListRefreshInterval: 1000
 #  eureka:
 #    enabled: true
-node:
+zvm-proxy:
   ribbon:
     NIWSServerListClassName: com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList
     MaxAutoRetries: 2
+#node:
+#  ribbon:
+#    NIWSServerListClassName: com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList
+#    MaxAutoRetries: 2
+#configserver:
+#  ribbon:
+#    NIWSServerListClassName: com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList
+#    MaxAutoRetries: 2
+#openid-server:
+#  ribbon:
+#    NIWSServerListClassName: com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList
+#    MaxAutoRetries: 2
 #    MaxAutoRetriesNextServer: 1
 #    OkToRetryOnAllOperations: true
 #    ServerListRefreshInterval: 2000

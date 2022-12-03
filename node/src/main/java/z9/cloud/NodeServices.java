@@ -45,7 +45,7 @@ public class NodeServices {
 	private KafkaTemplate<Integer, Object> template;
 
 
-	@RequestMapping(value = "/v1", method=RequestMethod.POST)
+	@RequestMapping(value = "/v1")
 	public String v1() {
 		return "hi there again! from " + env;
 	}

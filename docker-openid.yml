@@ -1,0 +1,62 @@
+version: "3"
+services:
+  config:
+    image: "davidshue/vbc-config:1.1.0"
+    hostname: "vbc-config"
+    ports:
+      - "8888:8888"
+    environment:
+      - JAVA_OPTS=-server -Xms32m -Xmx64m -XX:+UseParallelOldGC
+      - spring.profiles.active=native;spring.cloud.config.server.native.search_locations=file:/Users/david/workspace/config-repo
+    networks:
+      net:
+        aliases:
+          - vbc-config
+  server:
+    image: "davidshue/vbc-server:1.1.0"
+    hostname: "vbc-server"
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config
+    environment:
+      - JAVA_OPTS=-server -Xms32m -Xmx64m -XX:+UseParallelOldGC
+    networks:
+      net:
+        aliases:
+          - vbc-server
+  gateway:
+    image: "davidshue/vbc-gateway:1.1.0"
+    hostname: "vbc-gateway"
+    ports:
+      - "8005:8005"
+    depends_on:
+      - config
+      - server
+    environment:
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - CONFIG_HOST=vbc-config
+      - CONFIG_PORT=8888
+    networks:
+      net:
+        aliases:
+          - vbc-gateway
+  zvm-proxy:
+    image: "davidshue/vbc-zvm-proxy:1.1.0"
+    hostname: "vbc-zvm-proxy"
+    ports:
+      - "8080:8080"
+    environment:
+      - VBC_PROFILE=zvm-proxy
+      - JAVA_OPTS=-server -Xms128m -Xmx256m -XX:+UseParallelOldGC
+      - CONFIG_HOST=vbc-config
+      - CONFIG_PORT=8888
+    depends_on:
+      - config
+      - server
+    networks:
+      net:
+        aliases:
+          - vbc-zvm-proxy
+networks:
+  net:

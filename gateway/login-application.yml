@@ -1,0 +1,10 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 30463251451-2fivpa6nnht6ncltp27c2ugruvcskig2.apps.googleusercontent.com
+            client-secret: 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
+            #redirect-uri: "{baseScheme}://{baseHost}:8081{basePath}/login/oauth2/code/{registrationId}"
+            #redirect-uri: "{baseScheme}://{baseHost}:8081{basePath}/welcome"

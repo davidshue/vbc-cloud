@@ -4,5 +4,5 @@ spring:
       client:
         registration:
           google:
-            client-id: override
-            client-secret: override
+            client-id: 30463251451-2fivpa6nnht6ncltp27c2ugruvcskig2.apps.googleusercontent.com
+            client-secret: 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

@@ -13,7 +13,7 @@ import z9.cloud.core2.Output;
  */
 @FeignClient(name="gateway", fallback = NodeServiceFallback.class)
 public interface NodeService {
-	@RequestMapping(value = "/node/v1", method=RequestMethod.POST)
+	@RequestMapping(value = "/node/v1")
 	ResponseEntity<String> v1();
 
 	@RequestMapping(value= "/node/v1/test", method=RequestMethod.POST, consumes = "application/json")
